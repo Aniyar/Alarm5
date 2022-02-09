@@ -169,7 +169,8 @@ namespace ALARm.Core
         public void RemoveDigression(int id, int type);
         public int UpdateGapBase(Gap gap, Kilometer kilometer, RdAction action);
         public int UpdateBoltBase(Digression bolt, Kilometer kilometer, RdAction action);
-       
+        public int UpdateFastenerBase(Digression fastener, Kilometer kilometer, RdAction action);
+
 
     }
 }

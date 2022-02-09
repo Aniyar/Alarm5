@@ -4330,7 +4330,60 @@ namespace ALARm.DataAccess
 
 
             }
-            return -1;
+        }
+
+        public int UpdateFastenerBase(Digression fastener, Kilometer kilometer, RdAction action)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                NpgsqlTransaction transaction = (NpgsqlTransaction)db.BeginTransaction();
+                var command = new NpgsqlCommand();
+                command.Connection = (NpgsqlConnection)db;
+                command.Transaction = transaction;
+                try
+                {
+                    command.CommandText = $@"
+                    INSERT INTO report_badfasteners_history(state,trip_id,modi_date,user_id,pchu,station,km,mtr,otst,threat_id,fastening,notice,fnum,ms,fileid,original_id,editor,edit_reason,action)
+                    SELECT
+                        state,trip_id,CURRENT_TIMESTAMP,user_id,pchu,station,km,mtr,otst,threat_id,fastening,notice,fnum,ms,fileid,id,'{fastener.Editor}', '{fastener.EditReason}', {(int)action}
+                    FROM report_badfasteners WHERE report_badfasteners.id = {fastener.Id}
+                    ";
+                    command.ExecuteNonQuery();
+                    var prevPoint = kilometer.Point;
+                    if (action == RdAction.Delete)
+                    {
+                        command.CommandText = $"DELETE FROM report_badfasteners WHERE report_badfasteners.id = {fastener.Id}";
+                        command.ExecuteNonQuery();
+                        kilometer.Bolts.Remove(fastener);
+                    }
+                    else
+                    {
+                        command.CommandText = $@"
+                        UPDATE report_badfasteners
+                            SET otst = '{fastener.Otst}', threat_id = '{fastener.Threat_id}', fastening = '{fastener.Fastening}', modi_date=CURRENT_TIMESTAMP
+                        WHERE 
+                            id = {fastener.Id}
+                        ";
+                        command.ExecuteNonQuery();
+                    }
+                    kilometer.CalcPoint();
+                    transaction.Commit();
+                    return 1;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine($"UpdateFastener error: {e.Message}");
+                    return -1;
+
+                }
+                finally
+                {
+                    db.Close();
+                }
+            }
         }
 
         public void RemoveDigression(int id, int type)

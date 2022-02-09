@@ -51,6 +51,13 @@ namespace AlarmPP.Web.Components.Diagram
         /*private bool BoltDeleteDialog { get; set; } = false;*/
         private bool BoltEditDialog { get; set; } = false;
 
+        private Digression digressionFastener { get; set; } = new Digression();
+        private bool FastenerDeleteDialog { get; set; } = false;
+        private string FastenerEditor { get; set; }
+        private string FastenerEditReason { get; set; }
+        /*private bool BoltDeleteDialog { get; set; } = false;*/
+        private bool FastenerEditDialog { get; set; } = false;
+
 
 
         private Digression digressionO { get; set; } = new Digression();
@@ -183,6 +190,39 @@ namespace AlarmPP.Web.Components.Diagram
                     else
                     {
                         BoltEditDialog = false;
+                    }
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Не уадлость завершить редактирование из за ошибки: " + e.Message);
+            }
+        }
+
+        void UpdateFastener(RdAction action)
+        {
+
+            if (FastenerEditor == null || FastenerEditReason == null || FastenerEditor.Equals("") || FastenerEditReason.Equals("") || FastenerEditor.Equals(string.Empty) || FastenerEditReason.Equals(string.Empty))
+            {
+                Toaster.Add($"Заполните все поля диалогового окна", MatBlazor.MatToastType.Warning, "Редактирование отступлений");
+                return;
+            }
+            digressionFastener.EditReason = FastenerEditReason;
+            digressionFastener.Editor = FastenerEditor;
+            try
+            {
+                var kilometer = (from km in Kilometers where km.Number == digressionFastener.Km select km).First();
+                if (AppData.RdStructureRepository.UpdateFastenerBase(digressionFastener, kilometer, action) > 0)
+                {
+                    Toaster.Add($"Редактирование успешно завершено", MatBlazor.MatToastType.Success, "Редактирование отступлений");
+                    if (action == RdAction.Delete)
+                    {
+                        FastenerDeleteDialog = false;
+                    }
+                    else
+                    {
+                        FastenerEditDialog = false;
                     }
 
                 }
@@ -505,81 +545,40 @@ namespace AlarmPP.Web.Components.Diagram
             {
                 Stopwatch stopWatch = new();
                 stopWatch.Start();
-
-
                 digGapCurrentIndex = index;
                 digGapCurrentKm = data.Km;
                 digType = type;
                 JSRuntime.InvokeVoidAsync("loader", true);
-                digressionO = data;
+                digressionFastener = data;
                 DigressionImageDialog = true;
                 int upperKoef = 45;
                 var result = new Dictionary<String, Object>();
                 List<Object> shapes = new List<Object>();
 
-                var carPosition = 1;
-                var row1 = new List<Bitmap> { };
-                var row2 = new List<Bitmap> { };
-                var row3 = new List<Bitmap> { };
+                var carPosition = data.Direction_num;
+                List<List<Bitmap>> rows = new List<List<Bitmap>>();
+                int N_rows = 3;
+                for (int i = 0; i < N_rows; i++)
+                {
+                    rows.Add(new List<Bitmap>());
+                    var dic = AppData.AdditionalParametersRepository.getBitMaps(data.Fileid, data.Ms - 200 * (i - (int)N_rows / 2) * (int)carPosition, data.Fnum + (i - (int)N_rows / 2) * (int)carPosition, RepType.Undefined);
+                    rows[i] = (List<Bitmap>)dic["bitMaps"];
+                    ((List<Dictionary<String, Object>>)dic["drawShapes"]).ForEach(s => { shapes.Add(s); });
+                }
 
-                Parallel.Invoke(
-                        () => // Param #1 - lambda expression
-                        {
-                            var topDic = AppData.AdditionalParametersRepository.getBitMaps(data.Fileid, data.Ms - 200 * (int)carPosition, data.Fnum + 1 * (int)carPosition, RepType.Undefined);
-                            row1 = (List<Bitmap>)topDic["bitMaps"];
-                        },
-                        () => // Param #2 - in-line delegate
-                        {
-                            var centerDic = AppData.AdditionalParametersRepository.getBitMaps(data.Fileid, data.Ms, data.Fnum, RepType.Undefined);
-                            row2 = (List<Bitmap>)centerDic["bitMaps"];
-                        },
-                        () => // Param #3 - in-line delegate
-                        {
-                            var bottomDic = AppData.AdditionalParametersRepository.getBitMaps(data.Fileid, data.Ms + 200 * (int)carPosition, data.Fnum - 1 * (int)carPosition, RepType.Undefined);
-                            row3 = (List<Bitmap>)bottomDic["bitMaps"];
-                        }
-                    );
-
-                var commonBitMap = new Bitmap(row1[0].Width * 5 - 87, row1[0].Height * 3 - 175);
+                int W = rows[0][0].Width, H = rows[0][0].Height;
+                var commonBitMap = new Bitmap(W * 5 - 87, H * N_rows - 175);
                 Graphics g = Graphics.FromImage(commonBitMap);
 
-                int x1 = -7,
-                    y1 = -46,
-                    x2 = row1[0].Width - 20,
-                    y2 = -65,
-                    x3 = row1[1].Width + row1[1].Width + row1[2].Width - 60,
-                    y3 = -24,
-                    x4 = row1[1].Width + row1[1].Width + row1[2].Width + row1[3].Width - 120,
-                    y4 = -24;
-
-                int topx1 = -10,
-                    topy1 = row1[0].Height + y1 - 55,
-                    topx2 = row2[0].Width - 25,
-                    topy2 = row1[1].Height + y2 - 51,
-                    topx3 = row1[1].Width + row1[2].Width - 60,
-                    topx4 = row1[1].Width + row1[2].Width + row1[3].Width - 120;
-
-
-                g.DrawImageUnscaled(RotateImage(row1[0], -1), x1, y1);
-                g.DrawImageUnscaled(RotateImage(row1[1], 3), x2, y2);
-                g.DrawImageUnscaled(RotateImage(row1[2], 0), row1[0].Width + row1[1].Width - 30, -35);
-                g.DrawImageUnscaled(RotateImage(row1[4], 3), x4 - 20, y4);
-                g.DrawImageUnscaled(RotateImage(row1[3], -1), x3, y3);
-
-                g.DrawImageUnscaled(row2[0], topx1, topy1);
-                g.DrawImageUnscaled(RotateImage(row2[1], 1), topx2, topy2);
-                g.DrawImageUnscaled(RotateImage(row2[2], 1), row2[0].Width + row2[1].Width - 28, row2[2].Height - upperKoef);
-                g.DrawImageUnscaled(RotateImage(row2[4], 4), row2[1].Width + row2[1].Width + row2[2].Width + row2[3].Width - 135, row2[4].Height + y4 - 63);
-                g.DrawImageUnscaled(RotateImage(row2[3], -3), row2[1].Width + row2[1].Width + row2[2].Width - 57, row2[3].Height + y3 - 50);
-
-                g.DrawImageUnscaled(row3[0], -12, row3[0].Height * 2 - 2 * upperKoef - 10 - 60);
-                g.DrawImageUnscaled(RotateImage(row3[1], 1), row3[0].Width - 30, row3[1].Height * 2 - 2 * upperKoef - 80);
-                g.DrawImageUnscaled(RotateImage(row3[2], 1), row3[0].Width + row3[1].Width - 33, row3[2].Height * 2 - 2 * upperKoef - 60);
-                g.DrawImageUnscaled(RotateImage(row3[4], 4), row3[1].Width + row3[1].Width + row3[2].Width + row3[3].Width - 20 - 110, row2[4].Height * 2 - 2 * upperKoef - 70);
-                g.DrawImageUnscaled(RotateImage(row3[3], -3), row3[1].Width + row3[1].Width + row3[2].Width - 50, row3[3].Height * 2 - 2 * upperKoef - 50);
-
-
-                if (row2 != null)
+                for (int i = 0; i < N_rows; i++)
+                {
+                    g.DrawImageUnscaled(RotateImage(rows[i][0], -1), -12, (H - upperKoef) * i - 46);
+                    g.DrawImageUnscaled(RotateImage(rows[i][1], -1), W - 30, (H - upperKoef) * i - 65);
+                    g.DrawImageUnscaled(RotateImage(rows[i][2], 1), W * 2 - 33, (H - upperKoef) * i - 35);
+                    g.DrawImageUnscaled(RotateImage(rows[i][3], -2), W * 3 - 50, (H - upperKoef) * i - 24);
+                    g.DrawImageUnscaled(RotateImage(rows[i][4], 4), W * 4 - 130, (H - upperKoef) * i - 24);
+                }
+                if (rows[1] != null)
                 {
                     using MemoryStream m = new MemoryStream();
                     commonBitMap.Save(m, ImageFormat.Png);
@@ -1055,6 +1054,18 @@ namespace AlarmPP.Web.Components.Diagram
         {
             digressionBolt = bolt;
             BoltDeleteDialog = true;
+        }
+
+        void ModifyFastenerClick(Digression fastener)
+        {
+            digressionFastener = fastener;
+            FastenerEditDialog = true;
+        }
+
+        void DeleteFastenerClick(Digression fastener)
+        {
+            digressionFastener = fastener;
+            FastenerDeleteDialog = true;
         }
 
         public void DeleteModal(Digression dig, int type)
