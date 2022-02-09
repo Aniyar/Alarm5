@@ -45,6 +45,7 @@ namespace AlarmPP.Web.Components.Diagram
 
 
         private Digression digressionBolt { get; set; } = new Digression();
+        private bool BoltDeleteDialog { get; set; } = false;
         private string BoltEditor { get; set; }
         private string BoltEditReason { get; set; }
         /*private bool BoltDeleteDialog { get; set; } = false;*/
@@ -54,7 +55,6 @@ namespace AlarmPP.Web.Components.Diagram
 
         private Digression digressionO { get; set; } = new Digression();
         public bool DeleteModalState { get; set; } = false;
-        public bool DeleteGapModalState { get; set; } = false;
         private bool DigressionImageDialog { get; set; } = false;
         public FrontState State { get; set; } = FrontState.Undefined;
         public string ModalClass { get; set; } = "image-modal";
@@ -178,7 +178,7 @@ namespace AlarmPP.Web.Components.Diagram
                     Toaster.Add($"Редактирование успешно завершено", MatBlazor.MatToastType.Success, "Редактирование отступлений");
                     if (action == RdAction.Delete)
                     {
-                        /*BoltDeleteDialog = false;*/
+                        BoltDeleteDialog = false;
                     }
                     else
                     {
@@ -1039,32 +1039,22 @@ namespace AlarmPP.Web.Components.Diagram
             GapEditDialog = true;
         }
 
+        void DeleteGapClick(Gap gap)
+        {
+            digressionGap = gap;
+            GapDeleteDialog = true;
+        }
+
         void ModifyBoltClick(Digression bolt)
         {
             digressionBolt = bolt;
             BoltEditDialog = true;
         }
 
-        /*public async Task UpdateGapAsync(Gap gap)
+        void DeleteBoltClick(Digression bolt)
         {
-            digressionGap = gap;
-            var lZazor = await JSRuntime.InvokeAsync<string>("getLZazor");
-            var rZazor = await JSRuntime.InvokeAsync<string>("getRZazor");
-            var Zabeg = await JSRuntime.InvokeAsync<string>("getZabeg");
-            gap.Zazor = int.Parse(lZazor);
-            gap.R_zazor = int.Parse(rZazor);
-            gap.Zabeg = int.Parse(Zabeg);
-            AppData.RdStructureRepository.UpdateGap(gap);
-            Toaster.Add($"Успешно сохранено", MatBlazor.MatToastType.Success, "Успешно");
-        
-        }*/
-
-        public void DeleteGapModal(Gap gap, int type)
-        {
-            digressionGap = gap;
-            digType = type;
-            DeleteGapModalState = true;
-            StateHasChanged();
+            digressionBolt = bolt;
+            BoltDeleteDialog = true;
         }
 
         public void DeleteModal(Digression dig, int type)
@@ -1072,31 +1062,6 @@ namespace AlarmPP.Web.Components.Diagram
             digressionO = dig;
             digType = type;
             DeleteModalState = true;
-        }
-
-        public void RemoveDigression(Digression dig)
-        {
-            foreach (var km in AppData.Kilometers)
-            {
-                if (km.Number == dig.Km)
-                {
-                    km.Bolts.Remove(dig);
-                }
-            }
-            AppData.RdStructureRepository.RemoveDigression((int)dig.Id, digType);
-
-            Toaster.Add($"Успешно удалено", MatBlazor.MatToastType.Success, "Успешно");
-            DeleteModalState = false;
-        }
-
-        public void RemoveGap(Gap gap)
-        {
-            AppData.Kilometers.ForEach(o => o.Gaps.Remove(gap));
-            AppData.RdStructureRepository.RemoveDigression((int)gap.id, digType);
-            Toaster.Add($"Успешно удалено", MatBlazor.MatToastType.Success, "Успешно");
-            StateHasChanged();
-            DeleteGapModalState = false;
-
         }
     }
 }

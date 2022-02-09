@@ -4241,7 +4241,7 @@ namespace ALARm.DataAccess
                     var prevPoint = kilometer.Point;
                     if (action == RdAction.Delete)
                     {
-                        command.CommandText = $"DELETE FROM report_gaps WHERE report_gaps = {dGap.id}";
+                        command.CommandText = $"DELETE FROM report_gaps WHERE report_gaps.id = {dGap.id}";
                         command.ExecuteNonQuery();
                         kilometer.Gaps.Remove(dGap);
                     }
@@ -4256,27 +4256,6 @@ namespace ALARm.DataAccess
                         command.ExecuteNonQuery();
                     }
                     kilometer.CalcPoint();
-
-                    /*if (prevPoint != kilometer.Point)
-                    {
-                        command.CommandText = $@"
-                        INSERT INTO bedemost_history(
-                            original_id, km, ball, ots_iv_st, primech)
-                        SELECT
-                            id, km, ball, ots_iv_st, primech from bedemost
-                        WHERE 
-                            km = {dGap.Km} and track_id = {dGap.TrackId} and trip_id = {dGap.TripId}
-                        ";
-                        command.ExecuteNonQuery();
-                        command.CommandText = $@"
-                        UPDATE bedemost
-                            SET ball = {kilometer.Point}, ots_iv_st = '{dGap.LimitSpeedToString()}'
-                        WHERE 
-                            km = {dGap.Km} and track_id = {dGap.TrackId} and trip_id = {dGap.TripId}
-                        ";
-                        command.ExecuteNonQuery();
-                    }*/
-
                     transaction.Commit();
                     return 1;
                 }
@@ -4319,7 +4298,7 @@ namespace ALARm.DataAccess
                     var prevPoint = kilometer.Point;
                     if (action == RdAction.Delete)
                     {
-                        command.CommandText = $"DELETE FROM report_bolts WHERE report_bolts = {bolt.Id}";
+                        command.CommandText = $"DELETE FROM report_bolts WHERE report_bolts.id = {bolt.Id}";
                         command.ExecuteNonQuery();
                         kilometer.Bolts.Remove(bolt);
                     }
