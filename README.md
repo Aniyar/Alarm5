@@ -4,7 +4,7 @@
 
 Установка программы
 1) Через командную строку зайдите в папку, где хотите, чтобы хранился проект
-2) git clone https://github.com/Aniyar/Alarm.git
+2) git remote add origin https://github.com/Aniyar/Alarm.git
 
 Логин:
 1) git config --global user.email "email"
