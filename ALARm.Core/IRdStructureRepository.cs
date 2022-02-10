@@ -170,6 +170,7 @@ namespace ALARm.Core
         public int UpdateGapBase(Gap gap, Kilometer kilometer, RdAction action);
         public int UpdateBoltBase(Digression bolt, Kilometer kilometer, RdAction action);
         public int UpdateFastenerBase(Digression fastener, Kilometer kilometer, RdAction action);
+        public int UpdatePershpalBase(Digression pershpal, Kilometer kilometer, RdAction action);
 
 
     }
