@@ -665,7 +665,7 @@ namespace ALARm_Report.Forms
 
 						digression.DigNameToDigression(digression.DigName);
 
-						if (digression.Degree < 5)
+						if (digression.Degree < 6)
 							switch (digression.DigName)
 							{
 								case string digname when digname.Equals("Суж"):
