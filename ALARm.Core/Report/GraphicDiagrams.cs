@@ -1662,7 +1662,7 @@ namespace ALARm.Core.Report
                                                  new XAttribute("x", 170),
                                                  //new XAttribute("x", 145),
                                                  new XAttribute("Meter", note.Meter),
-                                                 new XAttribute("note", ogrSk),
+                                                 new XAttribute("note", note.Degree==1?"" : ogrSk),
                                                  new XAttribute("fw", note.FontStyle())
                                 ));
                         }
