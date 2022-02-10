@@ -308,24 +308,29 @@ namespace ALARm_Report.Forms
 
 					//подсчет для таблицы Количество километров с неисправностями по видам по ПЧ64
 
-					var grk = km.Digressions.Where(o => o.DigName.Equals("Суж") || o.DigName.Equals("Уш") || o.DigName.Equals("У") ||
-														o.DigName.Equals("Р") || o.DigName.Equals("П") || o.DigName.Equals("Пр.л") || o.DigName.Equals("Пр.п")).ToList();
+
+					var grk = km.Digressions.Where(o => (  !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") &&
+				 (o.DigName.Equals("Суж") || o.DigName.Equals("Уш") || o.DigName.Equals("У") ||
+														o.DigName.Equals("Рст") || o.DigName.Equals("Рст") || o.DigName.Equals("Р") || o.DigName.Equals("П") || o.DigName.Equals("Пр.л") || o.DigName.Equals("Пр.п")  )
+																				) ).ToList();
+					//&& !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") && !o.DigName.Contains("кривая факт.")
 					if (grk.Any()) Grk++;
 
-					var kriv = km.Digressions.Where(o => o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси")).ToList();
+					var kriv = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") &&
+				 (o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси"))).ToList();
 					if (kriv.Any()) Kriv++;
 
-					var pru = km.Digressions.Where(o => o.DigName.Equals("ПрУ")).ToList();
+					var pru = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && o.DigName.Equals("ПрУ")     ).ToList();
 					if (pru.Any()) Pru++;
 
-					var oshk = km.Digressions.Where(o => o.DigName.Equals("Oтв.ш")).ToList();
+					var oshk = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && o.DigName.Equals("Oтв.ш")).ToList();
 					if (oshk.Any()) Oshk++;
 
-					var iznos = km.Digressions.Where(o => o.DigName.Equals("Иб.л") || o.DigName.Equals("Иб.п") || o.DigName.Equals("Ив.л") || o.DigName.Equals("Ив.п") ||
-														  o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п")).ToList();
+					var iznos = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") &&( o.DigName.Equals("Иб.л") || o.DigName.Equals("Иб.п") || o.DigName.Equals("Ив.л") || o.DigName.Equals("Ив.п") ||
+														  o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п"))).ToList();
 					if (iznos.Any()) Iznos++;
 
-					var zazor = km.Digressions.Where(o => o.DigName.Equals("З")).ToList();
+					var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && o.DigName.Equals("З")).ToList();
 					if (zazor.Any()) Zazor++;
 
 

@@ -485,25 +485,35 @@ namespace ALARm_Report.Forms
 					//var grk = km.Digressions.Where(o => (o.DigName.Equals("Суж") || o.DigName.Equals("Уш") || o.DigName.Equals("У") ||
 					//									o.DigName.Equals("Р") || o.DigName.Equals("П") || o.DigName.Equals("Пр.л") || o.DigName.Equals("Пр.п")) && 
 					//									(o.Degree ==4 || o.Comment.Contains("м;") || o.Comment.Contains("гр") || o.Comment.Contains("рн;") || o.Comment.Contains("ис;"))).ToList();
-					var grk = km.Digressions.Where(o => (o.DigName.Equals("Суж") || o.DigName.Equals("Уш") || o.DigName.Equals("У") ||
-													o.DigName.Equals("Р") || o.DigName.Equals("П") || o.DigName.Equals("Пр.л") || o.DigName.Equals("Пр.п") || o.DigName.Equals("Рнр")) &&
-													(o.Degree == 4 || (o.FreightSpeedLimit > 0 && o.FreightSpeedLimit < o.FreightSpeedAllow) || (o.PassengerSpeedLimit > 0 && o.PassengerSpeedLimit < o.PassengerSpeedAllow))).ToList();
+					var grk = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") && (o.DigName.Equals("Суж") || o.DigName.Equals("Уш") || o.DigName.Equals("У") ||
+													o.DigName.Equals("Р") || o.DigName.Equals("П") || o.DigName.Equals("Пр.л") || o.DigName.Equals("Пр.п") || o.DigName.Equals("Рнр")
+													|| o.DigName.Equals("Рст")) &&
+													(o.Degree == 4 || (o.FreightSpeedLimit > 0 && o.FreightSpeedLimit < o.FreightSpeedAllow) || (o.PassengerSpeedLimit > 0 && o.PassengerSpeedLimit < o.PassengerSpeedAllow)
+													)).ToList();
+
 					if (grk.Any()) Grk += grk.Count;
 
-					var kriv = km.Digressions.Where(o => o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси")).ToList();
-					if (kriv.Any()) Kriv += kriv.Count;
+					var kriv = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") 
+					&& (  o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси") && !o.Comment.Contains("-/-") &&  !o.Comment.Contains("") && !o.FreightSpeedLimit.Equals("-") && !o.PassengerSpeedLimit.Equals("-"))).ToList();
+					if (kriv.Count > 0)
+					{
 
-					var pru = km.Digressions.Where(o => o.DigName.Equals("ПрУ")).ToList();
+					};
+					if (kriv.Any()) Kriv += kriv.Count;
+					
+
+					var pru = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?")  && o.DigName.Equals("ПрУ")).ToList();
 					if (pru.Any()) Pru += pru.Count;
 
-					var oshk = km.Digressions.Where(o => o.DigName.Equals("Oтв.ш")).ToList();
+					var oshk = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") && o.DigName.Equals("Oтв.ш")).ToList();
 					if (oshk.Any()) Oshk += oshk.Count;
 
 					var iznos = km.Digressions.Where(o => o.DigName.Equals("Иб.л") || o.DigName.Equals("Иб.п") || o.DigName.Equals("Ив.л") || o.DigName.Equals("Ив.п") ||
 														  o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п")).ToList();
 					if (iznos.Any()) Iznos += iznos.Count;
 
-					var zazor = km.Digressions.Where(o => o.DigName.Equals("З?") || o.DigName.Equals("З") || o.DigName.Equals("З п.") || o.DigName.Equals("З л.")).ToList();
+					var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") &&( o.DigName.Equals("З?") || o.DigName.Equals("З") || 
+					o.DigName.Equals("З п.") || o.DigName.Equals("З л."))).ToList();
 					if (zazor.Any()) Zazor += zazor.Count;
 
 
@@ -665,20 +675,32 @@ namespace ALARm_Report.Forms
 
 						digression.DigNameToDigression(digression.DigName);
 
-						if (digression.Degree < 6)
+						if (digression.Degree < 5)
 							switch (digression.DigName)
 							{
+								//case string digname when digname.Equals("Суж"):
+								//	digression.Digression = DigressionName.Constriction;
+								//	kmTotal.Constriction.Degrees[digression.Degree - 1] += digression.GetCount();
+								//	break;
 								case string digname when digname.Equals("Суж"):
 									digression.Digression = DigressionName.Constriction;
-									kmTotal.Constriction.Degrees[digression.Degree - 1] += digression.GetCount();
+									kmTotal.Constriction.Degrees[digression.Degree - 1] += 1;
 									break;
+								//case string digname when digname.Equals("Уш"):
+								//	digression.Digression = DigressionName.Broadening;
+								//	kmTotal.Broadening.Degrees[digression.Degree - 1] += digression.GetCount();
+								//	break;
 								case string digname when digname.Equals("Уш"):
 									digression.Digression = DigressionName.Broadening;
-									kmTotal.Broadening.Degrees[digression.Degree - 1] += digression.GetCount();
+									kmTotal.Broadening.Degrees[digression.Degree - 1] += 1;
 									break;
+								//case string digname when digname.Equals("У"):
+								//	digression.Digression = DigressionName.Level;
+								//	kmTotal.Level.Degrees[digression.Degree - 1] += digression.GetCount();
+								//	break;
 								case string digname when digname.Equals("У"):
 									digression.Digression = DigressionName.Level;
-									kmTotal.Level.Degrees[digression.Degree - 1] += digression.GetCount();
+									kmTotal.Level.Degrees[digression.Degree - 1] += 1;
 									break;
 								case string digname when digname.Equals("П"):
 									digression.Digression = DigressionName.Sag;
@@ -689,6 +711,14 @@ namespace ALARm_Report.Forms
 									kmTotal.Drawdown.Degrees[digression.Degree - 1] += digression.GetCount();
 									break;
 								case string digname when digname.Equals("Р"):
+									digression.Digression = DigressionName.Strightening;
+									kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
+									break;
+								case string digname when digname.Equals("Рнр"):
+									digression.Digression = DigressionName.Strightening;
+									kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
+									break;
+								case string digname when digname.Equals("Рст"):
 									digression.Digression = DigressionName.Strightening;
 									kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
 									break;
@@ -713,15 +743,22 @@ namespace ALARm_Report.Forms
 							{
 								kmTotal.Fourth++;
 							}
-							if (digression.Digtype != DigressionType.Main && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт."))
-							{
-								kmTotal.Additional++;
+						//if (digression.Digtype != DigressionType.Main && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт."))
+								if (digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.") && digression.DigName.Contains("Изн"))
+
+								{
+									kmTotal.Additional++;
 							}
 
 						}
 						if (digression.Comment != null)
 						{
-							if (digression.Comment.Contains("гр") && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт."))
+							if (!digression.Comment.Contains("гр") && !digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.")
+								&&!(digression.Degree == 4 && digression.Digtype == DigressionType.Main) && !digression.DigName.Contains("Изн")&& digression.LimitSpeedToString().Any(char.IsDigit)
+
+								)
+
+
 							{
 								//kmTotal.IsLimited = 1;
 								kmTotal.Other++;
@@ -741,8 +778,6 @@ namespace ALARm_Report.Forms
 						var kmmm = km.Number;
 					}
 					kmTotal.QualitiveRating = km.CalcQualitiveRating(kmTotal.MainParamPointSum + kmTotal.CurvePointSum, Districted);
-
-
 					var kmElement = new XElement("km",
 					new XAttribute("n", km.Number),
 					new XAttribute("len", km.Lkm % 1 == 0 ? km.Lkm.ToString("0", nfi) : km.Lkm.ToString("0.000", nfi)),
@@ -1249,7 +1284,9 @@ namespace ALARm_Report.Forms
 					new XAttribute("satisfactory", sectionTotal.RatingCounts[2].ToString("0.000", nfi)),
 					new XAttribute("bad", sectionTotal.RatingCounts[3].ToString("0.000", nfi)),
 					new XAttribute("limit", sectionTotal.IsLimited),
+					//
 					new XAttribute("d4", sectionTotal.Fourth),
+					//
 					new XAttribute("other", (sectionTotal.Combination + sectionTotal.Curves + sectionTotal.Other)),
 					new XAttribute("add", sectionTotal.Additional),
 					new XAttribute("repair", sectionTotal.Repairing),
