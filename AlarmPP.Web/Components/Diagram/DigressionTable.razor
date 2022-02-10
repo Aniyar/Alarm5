@@ -184,6 +184,7 @@
                 }
                 if (kilometer.Gaps != null)
                 {
+                    kilometer.Gaps = kilometer.Gaps.Where(o => o.Km == kilometer.Number).ToList();
                     foreach (var digression in kilometer.Gaps.Select((value, i) => new { i, value }))
                     {
                         digression.value.Put = kilometer.Track_name;
@@ -251,12 +252,13 @@
 
                 if (kilometer.Bolts != null)
                 {
-                    @*    kilometer.Bolts = kilometer.Bolts.Where(o => o.Km == kilometer.Number).ToList();*@
+                    kilometer.Bolts = kilometer.Bolts.Where(o => o.Km == kilometer.Number).ToList();
                     foreach (var bolt in kilometer.Bolts.Select((value, i) => new { i, value }))
                     {
                         bolt.value.Put = kilometer.Track_name;
                         bolt.value.Pdb_section = kilometer.PdbSection.Count > 0 ? kilometer.PdbSection[0].ToString() : "";
                         bolt.value.Date = DateTime.Today.ToShortDateString();
+                        bolt.value.Fragment = kilometer.Sector;
                         bolt.value.Direction_num = (kilometer.Direction == ALARm.Core.Direction.Direct) ? 1 : -1;
                         int metre = kilometer.Direction == ALARm.Core.Direction.Direct ? bolt.value.Meter : kilometer.Length - bolt.value.Meter;
                         int pos = currentKMPosition + metre;
@@ -293,6 +295,7 @@
                         int pos = currentKMPosition + metre;
                         fastener.value.Direction_num = (kilometer.Direction == ALARm.Core.Direction.Direct) ? 1 : -1;
                         fastener.value.Put = kilometer.Track_name;
+                        fastener.value.Fragment = kilometer.Sector;
                         fastener.value.Pdb_section = kilometer.PdbSection.Count > 0 ? kilometer.PdbSection[0].ToString() : "";
                         fastener.value.Date = DateTime.Today.ToShortDateString();
                         int index = rowIndex;
@@ -322,6 +325,11 @@
                     kilometer.PerShpals = kilometer.PerShpals.Where(o => o.Km == kilometer.Number).ToList();
                     foreach (var digression in kilometer.PerShpals.Select((value, i) => new { i, value }))
                     {
+                        digression.value.Put = kilometer.Track_name;
+                        digression.value.Pdb_section = kilometer.PdbSection.Count > 0 ? kilometer.PdbSection[0].ToString() : "";
+                        digression.value.Date = DateTime.Today.ToShortDateString();
+                        digression.value.Fragment = kilometer.Sector;
+                        digression.value.Direction_num = (kilometer.Direction == ALARm.Core.Direction.Direct) ? 1 : -1;
                         int metre = kilometer.Direction == ALARm.Core.Direction.Direct ? digression.value.Meter : kilometer.Length - digression.value.Meter;
                         int pos = currentKMPosition + metre;
                         int index = rowIndex;
@@ -336,8 +344,9 @@
                                 <td style="border-right: 1px solid grey; width: 125px;">@digression.value.Fastener</td>
                                 <td style="border-right: 1px solid grey; width: 125px;"></td>
                                 <td>
-                                    <AlarmButton Text="" Symbol="" Tooltip="Удалить" OnClick="() => DeleteModal(digression.value, 4)"></AlarmButton>
-                                    <AlarmButton Text="" Symbol="" Tooltip="Фото" OnClick="() => GetImagePerShpals(digression.value, digression.i, 4)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="" Tooltip="Удалить" OnClick="() => DeletePerShpalClick(digression.value)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="" Tooltip="Редактировать" OnClick="() => ModifyPerShpalClick(digression.value)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="📷" Tooltip="Фото" OnClick="() => GetImagePerShpals(digression.value, digression.i, 4)"></AlarmButton>
                                 </td>
                             </tr>
                             rowIndex++;
@@ -527,6 +536,38 @@
     </MatDialogActions>
 </MatDialog>
 
+
+<MatDialog @bind-IsOpen="@PerShpalDeleteDialog" Stacked="true">
+    <MatDialogTitle>Удаление перпендикулярной шпалы</MatDialogTitle>
+    <MatDialogContent>
+        <br />
+        <MatTextField @bind-Value="@PerShpalEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@PerShpalEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdatePerShpal(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { PerShpalDeleteDialog = false;}">Отменить</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
+
+<MatDialog @bind-IsOpen="@PerShpalEditDialog" Stacked="true">
+    <MatDialogTitle>Корректировка перпендикулярной шпалы</MatDialogTitle>
+    <MatDialogContent>
+        <br />
+        <MatTextField @bind-Value="@PerShpalEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@PerShpalEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="PerShpal.Angle" Label="Угол:" Style="width:45%" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="PerShpal.Fastener" Label="Скрепление:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+@*        <MatTextField @bind-Value="PerShpal.Vdop" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+*@
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdatePerShpal(ALARm.Core.Report.RdAction.Modify);  }">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { PerShpalEditDialog = false;}">Закрыть</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
 <MatDialog @bind-IsOpen="@DigressionImageDialog" Stacked="true" Class="image-modal">
     <MatDialogTitle>Фото</MatDialogTitle>
     <MatDialogContent>
@@ -543,7 +584,7 @@
                             Дата проверки:
                             <b>@digressionGap.Date</b>
                         </td>
-                        <td align="left">Проверка: Дополнительная</td>
+                        <td>Проверка: Дополнительная</td>
 
                     </tr>
                     <tr>
@@ -556,7 +597,7 @@
                             Км:
                             <b>@digressionGap.Km</b>
                         </td>
-                        <td align="left">
+                        <td>
                             Метр:
                             <b>@digressionGap.Meter</b>
                         </td>
@@ -598,7 +639,7 @@
                             Дата проверки:
                             <b>@digressionBolt.Date</b>
                         </td>
-                        <td align="left">Проверка: Дополнительная</td>
+                        <td>Проверка: Дополнительная</td>
 
                     </tr>
                     <tr>
@@ -624,7 +665,7 @@
                             До стыка:
                             <b>@digressionBolt.Before</b>
                         </td>
-                        <td align="left">
+                        <td>
                             После стыка:
                             <b>@digressionBolt.After</b>
                         </td>
@@ -644,7 +685,7 @@
                             Дата проверки:
                             <b>@digressionFastener.Date</b>
                         </td>
-                        <td align="left">Проверка: Дополнительная</td>
+                        <td>Проверка: Дополнительная</td>
 
                     </tr>
                     <tr>
@@ -656,25 +697,68 @@
                             Км:
                             <b>@digressionFastener.Km</b>
                         </td>
-                        <td align="left">
+                        <td>
                             Метр:
                             <b>@digressionFastener.Mtr</b>
                         </td>
                     </tr>
                     <tr>
-                            <td>
-                                Отступление:
-                                <b>@digressionFastener.Otst</b>
-                            </td>
-                            <td>
-                                Сторона:
-                                <b>@digressionFastener.Threat_id</b>
-                            </td>
-                            <td align="left">
-                                Скрепление:
-                                <b>@digressionFastener.Fastening</b>
-                            </td>
-                        </tr>
+                        <td>
+                            Отступление:
+                            <b>@digressionFastener.Otst</b>
+                        </td>
+                        <td>
+                            Сторона:
+                            <b>@digressionFastener.Threat_id</b>
+                        </td>
+                        <td>
+                            Скрепление:
+                            <b>@digressionFastener.Fastening</b>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        }
+
+        @if (AppData.ShowPerShpals)
+        {
+            <div align="center">
+                <table style="font-size: 16px; font-family: 'Times New Roman'; width: 100%; margin: auto;margin-bottom:8px;border-collapse: collapse">
+                    <tr>
+                        <td align="left">@PerShpal.Pdb_section</td>
+                        <td align="left">@PerShpal.Fragment</td>
+                        <td>
+                            Дата проверки:
+                            <b>@PerShpal.Date</b>
+                        </td>
+                        <td>Проверка: Дополнительная</td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            Путь:
+                            <b>@PerShpal.Put</b>
+                        </td>
+                        <td>
+                            Км:
+                            <b>@PerShpal.Km</b>
+                        </td>
+                        <td>
+                            Метр:
+                            <b>@PerShpal.Meter</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Угол:
+                            <b>@PerShpal.Angle</b>
+                        </td>
+                        <td>
+                            Скрепление:
+                            <b>@digressionFastener.Fastener</b>
+                        </td>
+                        <td></td>
+                    </tr>
                 </table>
             </div>
         }

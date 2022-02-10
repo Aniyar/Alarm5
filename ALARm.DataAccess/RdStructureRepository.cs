@@ -4356,7 +4356,7 @@ namespace ALARm.DataAccess
                     {
                         command.CommandText = $"DELETE FROM report_badfasteners WHERE report_badfasteners.id = {fastener.Id}";
                         command.ExecuteNonQuery();
-                        kilometer.Bolts.Remove(fastener);
+                        kilometer.Fasteners.Remove(fastener);
                     }
                     else
                     {
@@ -4376,6 +4376,60 @@ namespace ALARm.DataAccess
                 {
                     transaction.Rollback();
                     Console.WriteLine($"UpdateFastener error: {e.Message}");
+                    return -1;
+
+                }
+                finally
+                {
+                    db.Close();
+                }
+            }
+        }
+
+        public int UpdatePershpalBase(Digression pershpal, Kilometer kilometer, RdAction action)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                NpgsqlTransaction transaction = (NpgsqlTransaction)db.BeginTransaction();
+                var command = new NpgsqlCommand();
+                command.Connection = (NpgsqlConnection)db;
+                command.Transaction = transaction;
+                try
+                {
+                    command.CommandText = $@"
+                    INSERT INTO report_violperpen_history(trip_id,km,meter,vdop,angle,fastener,file_id,fnum,ms,original_id,editor,edit_reason,modi_date,action)
+                    SELECT
+                        trip_id,km,meter,vdop,angle,fastener,file_id,fnum,ms,id,'{pershpal.Editor}', '{pershpal.EditReason}', CURRENT_TIMESTAMP, {(int)action}
+                    FROM report_violperpen WHERE report_violperpen.id = {pershpal.Id}
+                    ";
+                    command.ExecuteNonQuery();
+                    var prevPoint = kilometer.Point;
+                    if (action == RdAction.Delete)
+                    {
+                        command.CommandText = $"DELETE FROM report_violperpen WHERE report_violperpen.id = {pershpal.Id}";
+                        command.ExecuteNonQuery();
+                        kilometer.Bolts.Remove(pershpal);
+                    }
+                    else
+                    {
+                        command.CommandText = $@"
+                        UPDATE report_violperpen
+                            SET angle = '{pershpal.Angle}', fastener = '{pershpal.Fastener}'
+                        WHERE 
+                            id = {pershpal.Id}
+                        ";
+                        command.ExecuteNonQuery();
+                    }
+                    kilometer.CalcPoint();
+                    transaction.Commit();
+                    return 1;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine($"UpdatePershpal error: {e.Message}");
                     return -1;
 
                 }
