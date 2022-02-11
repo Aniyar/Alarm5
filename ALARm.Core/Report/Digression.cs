@@ -293,6 +293,7 @@ namespace ALARm.Core.Report
         }
 
         public string Alert { get; set; } = string.Empty;
+        public string Aniayr { get; set; } = string.Empty;
         public int DeltaM { get; set; }
         public int DeltaKM { get; set; } 
 

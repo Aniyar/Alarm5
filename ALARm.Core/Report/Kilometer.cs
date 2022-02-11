@@ -521,6 +521,7 @@ namespace ALARm.Core
         public List<int> Meters = new List<int>();
         public List<int> _Meters = new List<int>();
         public List<Picket> Pickets = new List<Picket>();
+        public List<CorrectionNote> CorrectionNotes = new List<CorrectionNote>();
         public int CorrectionValue { get; set; } = -1;
         public int CorrectionMeter { get; set; } = -1;
         public CorrectionType CorrectionType { get; set; } = CorrectionType.None;
@@ -867,7 +868,7 @@ namespace ALARm.Core
 
                 foreach (var curve in Curves)
                 {
-                    if(curve.Straightenings.Count > curve.Elevations.Count)
+                    if (curve.Straightenings.Count > curve.Elevations.Count)
                     {
                         foreach (var item in curve.Straightenings)
                         {
@@ -883,11 +884,11 @@ namespace ALARm.Core
                                 Digressions.Add(
                                 new DigressionMark()
                                 {
-                                    Meter = item.Start_M + item.Transition_1 ,
+                                    Meter = item.Start_M + item.Transition_1,
                                     Alert = $"{item.Start_M + item.Transition_1} R:{item.Radius} h:{h} Ш:{item.Width} И:{item.Wear}"
                                 });
                             }
-                        }                        
+                        }
                     }
                     else
                     {
@@ -911,7 +912,7 @@ namespace ALARm.Core
                                 Digressions.Add(
                                 new DigressionMark()
                                 {
-                                    Meter = item.Start_M + item.Transition_1 ,
+                                    Meter = item.Start_M + item.Transition_1,
                                     Alert = $"{item.Start_M + item.Transition_1} R:{Radius} h:{item.Lvl} Ш:{Width} И:{Wear}"
                                 });
                             }
@@ -934,19 +935,19 @@ namespace ALARm.Core
 
                 if (CorrectionMeter > -1)
                 {
-                    var tempKms= rdStructureRepository.GetKilometersByTrip(trip);
+                    var tempKms = rdStructureRepository.GetKilometersByTrip(trip);
                     var currentKm = tempKms.Where(o => o.Number == Number).ToList();
-                    var prevKm = tempKms.Where(o => o.Number == Number -1).ToList();
+                    var prevKm = tempKms.Where(o => o.Number == Number - 1).ToList();
                     var count = tempKms.Count;
 
                     var coord = Final_m;
-                    if(trip.Travel_Direction == Direction.Reverse)
+                    if (trip.Travel_Direction == Direction.Reverse)
                     {
                         coord = Start_m;
                         prevKm = tempKms.Where(o => o.Number == Number + 1).ToList();
                     }
 
-                    if ((currentKm.Any() &&  prevKm.Any()) ||( count==1)) ///&& prevKm.Any()
+                    if ((currentKm.Any() && prevKm.Any()) || (count == 1)) ///&& prevKm.Any()
                     {
                         var currentOutData = (List<OutData>)rdStructureRepository.GetNextOutDatas(currentKm.First().Start_Index - 1, currentKm.First().GetLength() - 1, currentKm.First().Trip.Id);
                         var prevOutData = (List<OutData>)rdStructureRepository.GetNextOutDatas(prevKm.First().Start_Index - 1, prevKm.First().GetLength() - 1, prevKm.First().Trip.Id);
@@ -963,7 +964,8 @@ namespace ALARm.Core
 
                         var valuecurrent = currentMeterNature - currentMeterPassport;
                         var valueprev = PrevMeterNature - PrevMeterPassport;
-                    
+
+
 
                         Digressions.Add(
                            new DigressionMark()
@@ -971,53 +973,69 @@ namespace ALARm.Core
                                NotMoveAlert = true,
                                Meter = coord,
                                Alert = $"{coord} Привязка координат: {(CorrectionType == CorrectionType.Manual ? "РП" : "АП")} коррекция; начальной привязки на {CorrectionValue}   метр"
-                           }) ;
+
+                           });
+                        //var ANIAYRAMOLODEC = rdStructureRepository.InsertCorrection(trip.Id,Track_id,Number,coord , Correctiontype, CorrectionValue);
+                        var ANIAYRAMOLODEC = rdStructureRepository.InsertCorrection(trip.Id, Track_id, Number, coord,  CorrectionValue);
+
+
+
 
                     }
-                }
-                
-                if (StationSection.Count > 0)
-                {
-                    if (StationSection[0].Start_Km == Number)
+
+                    if (StationSection.Count > 0)
                     {
-                        Sector = mainTrackStructureRepository.GetSector(Track_id, Number - 1, trip.Trip_date) ?? "";
-                        Digressions.Add(new DigressionMark() { NotMoveAlert = true, Meter = StationSection[0].Start_M, Alert = $"{StationSection[0].Start_M} Станция: {StationSection[0].Station};        {Sector}" });
-                    }
-                    else
-                    if (StationSection[0].Final_Km == Number)
-                    {
-                        Sector = mainTrackStructureRepository.GetSector(Track_id, Number + 1, trip.Trip_date) ?? "";
-                        Digressions.Add(new DigressionMark() { NotMoveAlert = true, Meter = StationSection[0].Final_M, Alert = $"       {Sector};{StationSection[0].Final_M} Станция: {StationSection[0].Station}" });
-                    }
-                }
-
-                Digressions.AddRange(rdStructureRepository.GetDigressionMarks(trip.Id, Track_id, Number));
-            }
-            else
-            {
-                foreach (var curve in Curves)
-                {
-                    if (curve.Start_Km == Number)
-                        Digressions.Add(new DigressionMark() { Meter = curve.Start_M, Alert = $"{curve.Start_M} R:{curve.Straightenings[0].Radius} h:{curve.Elevations[0].Lvl} Ш:{curve.Straightenings[0].Width} И:{curve.Straightenings[0].Wear}" });
-                }
-
-                int pas = 999, gruz = 999;
-            
-
-                foreach (var item in Digressions)
-                {
-                    if (item.Meter == 386)
-                    { 
-
-                    }
-                    if (item.Digression == DigressionName.SideWearLeft || item.Digression == DigressionName.SideWearRight)
-                    {
-                        var c = Curves.Where(o => o.RealStartCoordinate <= Number + item.Meter / 10000.0 && o.RealFinalCoordinate >= Number + item.Meter / 10000.0).ToList();
-
-                        if (c.Any())
+                        if (StationSection[0].Start_Km == Number)
                         {
-                            item.GetAllowSpeedAddParam(Speeds.First(), c.First().Straightenings[0].Radius, item.Value);
+                            Sector = mainTrackStructureRepository.GetSector(Track_id, Number - 1, trip.Trip_date) ?? "";
+                            Digressions.Add(new DigressionMark() { NotMoveAlert = true, Meter = StationSection[0].Start_M, Alert = $"{StationSection[0].Start_M} Станция: {StationSection[0].Station};        {Sector}" });
+                        }
+                        else
+                        if (StationSection[0].Final_Km == Number)
+                        {
+                            Sector = mainTrackStructureRepository.GetSector(Track_id, Number + 1, trip.Trip_date) ?? "";
+                            Digressions.Add(new DigressionMark() { NotMoveAlert = true, Meter = StationSection[0].Final_M, Alert = $"       {Sector};{StationSection[0].Final_M} Станция: {StationSection[0].Station}" });
+                        }
+                    }
 
+                    Digressions.AddRange(rdStructureRepository.GetDigressionMarks(trip.Id, Track_id, Number));
+                }
+                else
+                {
+                    foreach (var curve in Curves)
+                    {
+                        if (curve.Start_Km == Number)
+                            Digressions.Add(new DigressionMark() { Meter = curve.Start_M, Alert = $"{curve.Start_M} R:{curve.Straightenings[0].Radius} h:{curve.Elevations[0].Lvl} Ш:{curve.Straightenings[0].Width} И:{curve.Straightenings[0].Wear}" });
+                    }
+
+                    int pas = 999, gruz = 999;
+
+
+                    foreach (var item in Digressions)
+                    {
+                        if (item.Meter == 386)
+                        {
+
+                        }
+                        if (item.Digression == DigressionName.SideWearLeft || item.Digression == DigressionName.SideWearRight)
+                        {
+                            var c = Curves.Where(o => o.RealStartCoordinate <= Number + item.Meter / 10000.0 && o.RealFinalCoordinate >= Number + item.Meter / 10000.0).ToList();
+
+                            if (c.Any())
+                            {
+                                item.GetAllowSpeedAddParam(Speeds.First(), c.First().Straightenings[0].Radius, item.Value);
+
+                                if (item.PassengerSpeedLimit != -1 && item.PassengerSpeedLimit < pas)
+                                {
+                                    pas = item.PassengerSpeedLimit;
+                                }
+                                if (item.FreightSpeedLimit != -1 && item.FreightSpeedLimit < gruz)
+                                {
+                                    gruz = item.FreightSpeedLimit;
+                                }
+                            }
+                        } else if (item.Digression == DigressionName.Gap)
+                        {
                             if (item.PassengerSpeedLimit != -1 && item.PassengerSpeedLimit < pas)
                             {
                                 pas = item.PassengerSpeedLimit;
@@ -1027,64 +1045,54 @@ namespace ALARm.Core
                                 gruz = item.FreightSpeedLimit;
                             }
                         }
-                    } else if (item.Digression == DigressionName.Gap)
+                    }
+
+                    SpeedLimit = $"{(Speeds.First().Passenger <= pas || pas == 999 ? "-/" : $"{pas}/")}{(Speeds.First().Freight <= gruz || gruz == 999 ? "-" : $"{gruz}")}";
+
+                    Digressions.AddRange((
+                           from vpicket in VPickets
+                           select new DigressionMark()
+                           {
+                               Meter = vpicket.Meter1,
+                               Alert = $"{vpicket.Meter2} Уст.ск:{vpicket.Picket2PassengerSpeed}/{vpicket.Picket2FreightSpeed} Уст.ск:{vpicket.Picket1PassengerSpeed}/{vpicket.Picket1FreightSpeed}"
+                           }).ToList());
+                }
+                //Digressions = rdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] { 2, 3, 4 });
+                //Gaps = mainTrackStructureRepository.GetGaps(Trip.Id, GapSource.Laser, km.Number);
+
+                //Убираем дублирование отступлении
+                var newList = new List<DigressionMark> { };
+
+                foreach (var digression in Digressions)
+                {
+                    var isDublicate = newList.Where(o => o.Km == digression.Km && o.Meter == digression.Meter && o.Alert == digression.Alert && o.DigName == digression.DigName).ToList();
+                    if (isDublicate.Any())
+                        continue;
+                    newList.Add(digression);
+                }
+
+                Digressions = newList;
+
+                foreach (var digression in Digressions)
+                {
+                    var picket = Pickets.GetPicket(digression.Meter);
+                    if (picket != null)
                     {
-                        if (item.PassengerSpeedLimit != -1 && item.PassengerSpeedLimit < pas)
-                        {
-                            pas = item.PassengerSpeedLimit;
-                        }
-                        if (item.FreightSpeedLimit != -1 && item.FreightSpeedLimit < gruz)
-                        {
-                            gruz = item.FreightSpeedLimit;
-                        }
+                        if (CNI != "")
+                            digression.CNI = CNI;
+
+                        picket.Digression.Add(digression);
                     }
                 }
 
-                SpeedLimit = $"{(Speeds.First().Passenger <= pas || pas == 999 ? "-/" : $"{pas}/")}{(Speeds.First().Freight <= gruz || gruz == 999 ? "-" : $"{gruz}")}";
-
-                Digressions.AddRange((
-                       from vpicket in VPickets
-                       select new DigressionMark()
-                       {
-                           Meter = vpicket.Meter1,
-                           Alert = $"{vpicket.Meter2} Уст.ск:{vpicket.Picket2PassengerSpeed}/{vpicket.Picket2FreightSpeed} Уст.ск:{vpicket.Picket1PassengerSpeed}/{vpicket.Picket1FreightSpeed}"
-                       }).ToList());
-            }
-            //Digressions = rdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] { 2, 3, 4 });
-            //Gaps = mainTrackStructureRepository.GetGaps(Trip.Id, GapSource.Laser, km.Number);
-
-            //Убираем дублирование отступлении
-            var newList = new List<DigressionMark> { };
-
-            foreach (var digression in Digressions)
-            {
-                var isDublicate = newList.Where(o => o.Km == digression.Km && o.Meter == digression.Meter && o.Alert == digression.Alert && o.DigName == digression.DigName).ToList();
-                if (isDublicate.Any())
-                    continue;
-                newList.Add(digression);
-            }
-
-            Digressions = newList;
-
-            foreach (var digression in Digressions)
-            {
-                var picket = Pickets.GetPicket(digression.Meter);
-                if (picket != null)
+                if (!AdditionalParam)
                 {
-                    if (CNI != "")
-                        digression.CNI = CNI;
-
-                    picket.Digression.Add(digression);
-                }
-            }
-
-            if (!AdditionalParam)
-            {
-                var bedemost = rdStructureRepository.GetBedemost(trip.Id, Track_id, Number);
-                if (bedemost.Count > 0)
-                {
-                    SpeedLimit = (string)bedemost["limit"];
-                    Point = (int)bedemost["ball"];
+                    var bedemost = rdStructureRepository.GetBedemost(trip.Id, Track_id, Number);
+                    if (bedemost.Count > 0)
+                    {
+                        SpeedLimit = (string)bedemost["limit"];
+                        Point = (int)bedemost["ball"];
+                    }
                 }
             }
         }

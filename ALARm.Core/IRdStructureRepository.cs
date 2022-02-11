@@ -170,7 +170,9 @@ namespace ALARm.Core
         public int UpdateGapBase(Gap gap, Kilometer kilometer, RdAction action);
         public int UpdateBoltBase(Digression bolt, Kilometer kilometer, RdAction action);
         public int UpdateFastenerBase(Digression fastener, Kilometer kilometer, RdAction action);
-
-
+        public int InsertCorrection(long trip_id, int track_id, int Number, int coord,  int CorrectionValue);
+        public List<CorrectionNote> GetCorrectionNotes(long trip_id, int track_id, int Number, int coord, int CorrectionValue);
+        //public int GetCorrectionNotes(long trip_id, int track_id, int Number, int coord, int CorrectionValue);
+        //public int InsertCorrection(long trip_id, int track_id, int Number, int coord, string CorrectionType, int CorrectionValue);
     }
 }

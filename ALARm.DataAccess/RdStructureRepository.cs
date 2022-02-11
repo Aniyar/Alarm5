@@ -2571,7 +2571,7 @@ namespace ALARm.DataAccess
                 SELECT trip.*, direction.name as direction_name FROM trips as trip 
                 INNER JOIN adm_direction as direction on direction.id = trip.direction_id
                 WHERE
-                  trip.id = 242
+                  trip.id = 240
                   --current = true 
                   order by id desc limit 1";
                 
@@ -3300,7 +3300,17 @@ namespace ALARm.DataAccess
 
             }
         }
-
+        public List<CorrectionNote> GetCorrectionNotes(long trip_id, int Track_id, int Number, int coord, int CorrectionValue)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+             
+                return db.Query<CorrectionNote>($@"select * from s3_correction where km={Number} ").ToList();
+            }
+        }
+        
         public List<DigressionMark> GetDigressionMarks(long trip_id, int km, long track_id, int[] type)
         {
             using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
@@ -3817,32 +3827,37 @@ namespace ALARm.DataAccess
         {
             using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
             {
-             //   if (db.State == ConnectionState.Closed)
-             //       db.Open();
-             //   return db.Query<DigressionMark>($@"
-             //   select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
-             //   uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
-	            //CASE
-             //   WHEN primech='Натурная кривая' THEN ots
-             //   ELSE ''
-             //   END 
-             //   AS alert
-             //   from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km} and isadditional = 0 and 
-	            //typ > 1 order by meter").ToList();
+                //   if (db.State == ConnectionState.Closed)
+                //       db.Open();
+                //   return db.Query<DigressionMark>($@"
+                //   select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
+                //   uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
+                //CASE
+                //   WHEN primech='Натурная кривая' THEN ots
+                //   ELSE ''
+                //   END 
+                //   AS alert
+                //   from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km} and isadditional = 0 and 
+                //typ > 1 order by meter").ToList();
 
 
                 if (db.State == ConnectionState.Closed)
                     db.Open();
                 return db.Query<DigressionMark>($@"
-                select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
+                SELECT DISTINCT  
+	 
+                min(id) as id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
                 uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
 	            CASE
                 WHEN primech='Натурная кривая' THEN ots
                 ELSE ''
                 END 
                 AS alert
-                from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}  and 
-	            typ > 1 order by meter").ToList();
+                from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}   and 
+	            typ > 1
+                GROUP BY track_id, trip_id, km, typ, len, otkl, kol, ots, ovp, ogp, uv, uvg, is2to3, isequalto3, isequalto4, onswitch, islong, primech, meter
+                ORDER BY
+	                meter").ToList();
             }
         }
         /// <summary>
@@ -3951,6 +3966,47 @@ namespace ALARm.DataAccess
              
             }
             return -1;
+        }
+
+        public int InsertCorrection(long trip_id, int track_id, int Number, int coord, int CorrectionValue)
+            //public int InsertCorrection(long trip_id, int track_id, int Number, int coord, string CorrectionType, int CorrectionValue)
+        //public int InsertCorrection(trip.Id, Track_id, Number, coord, $"{coord} Привязка координат: {(CorrectionType == CorrectionType.Manual ? "РП" : "АП")} коррекция; начальной привязки на {CorrectionValue}   метр")
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                NpgsqlTransaction transaction = (NpgsqlTransaction)db.BeginTransaction();
+                var command = new NpgsqlCommand();
+                command.Connection = (NpgsqlConnection)db;
+                command.Transaction = transaction;
+                try
+                {
+                    command.CommandText = $@"
+                    INSERT INTO s3_correction(
+	                 trip_id,track_id,km,coord,correctionvalue)
+                    VALUES
+                        ({trip_id} ,{track_id}, {Number}, {coord}, {CorrectionValue} ) ";
+                    command.ExecuteNonQuery();
+                    //var prevPoint = kilometer.Point;
+
+                    transaction.Commit();
+                    return 1;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine($"UpdateDigression error: {e.Message}");
+                    return -1;
+
+                }
+                finally
+                {
+                    db.Close();
+                }
+
+
+            }
         }
 
         public List<NotCheckedKm> GetDop2(long trip_id, long distId)

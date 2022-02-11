@@ -294,6 +294,7 @@ namespace ALARm.Core.Report
             //рисуем рихтовочную нить
             var strightsnode = new XElement("strights");
             {
+
                 var st = kilometer.signTrapez[0];
                 int start = kilometer.meter[0];
                 int final = kilometer.meter[1];
@@ -377,6 +378,8 @@ namespace ALARm.Core.Report
 
                 int y = Iso;
 
+
+
                 var xleft = MMToPixelChartString(ArtificalEntrance - ArtificialHeadWidth * 1.5f + 4).Replace(",", ".");
                 var xright = MMToPixelChartString(ArtificalEntrance + ArtificialHeadWidth * 1.5f + 0.5).Replace(",", ".");
                 var xleft1 = MMToPixelChartString(ArtificalEntrance - ArtificialHeadWidth * 1.5f + 3).Replace(",", ".");
@@ -429,9 +432,13 @@ namespace ALARm.Core.Report
                 {
 
                 }
-              //  if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
-               //     continue;
+                //  if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                //     continue;
 
+                if (sw.Start_M > kilometer.Final_m )
+                    continue;
+                if (sw.Start_M < kilometer.Start_m)
+                    continue;
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
                 int end = kilometer.Number == sw.Final_Km ? sw.Final_M : kilometer.Final_m;
 
@@ -532,6 +539,10 @@ namespace ALARm.Core.Report
 
                 if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
                     continue;
+               // if (sw.Start_M > kilometer.Final_m + 10)
+                //    continue;
+               // if (sw.Start_M < kilometer.Start_m - 10)
+                //    continue;
 
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
                 int end = kilometer.Number == sw.Final_Km ? sw.Final_M : kilometer.Final_m;
@@ -734,6 +745,8 @@ namespace ALARm.Core.Report
                     int meter = note.Meter.RoundTo10();
                     if (!((meter >= Start.RoundTo10()) && (meter < Number * 100)))
                         meter = Start + 10;
+                    if (kilometer.StationSection.Any())
+                        meter = Start + 20;
                     if (meter <= Start.RoundTo10() + 10)
                         meter += 10;
 
@@ -843,7 +856,12 @@ namespace ALARm.Core.Report
                         }
                         continue;
                     }
-                    if (note.Note().Contains("Стрелка"))
+                    if (note.Km == 715)
+                    {
+
+                    }
+
+                    if (note.Note().Contains("Стрелка") && note.Meter > kilometer.Start_m)
                     {
                         digElements.Add(new XElement("rect",
                                                     new XAttribute("top", -meter - 9),
@@ -861,10 +879,14 @@ namespace ALARm.Core.Report
                         continue;
 
                     }
-                    if (note.DigName.Contains("Рнрст"))
+                    if (note.DigName.Any()) 
                     {
-                        continue;
+                        if (note.DigName.Contains("Рнрст"))
+                        {
+                            continue;
+                        }
                     }
+                  
                     if (note.DigName.Contains("ПрУ"))
                     {
                         digElements.Add(new XElement("m",

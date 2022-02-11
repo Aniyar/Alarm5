@@ -1,0 +1,32 @@
+﻿<h4>Прибивки</h4>
+<table>
+    <tr>
+        <th>Км</th>
+        <th>м</th>
+        <th>тип корректировки</th>
+        <th>значение</th>
+        <th>кордината</th>
+
+    </tr>
+    @if (kilometers != null)
+    {
+       
+        {
+            foreach (var km in kilometers)
+            {
+                foreach (var corectnion in km.CorrectionNotes)
+                {
+                    <tr>
+                        <th>@corectnion.Km</th>
+                        <th>@corectnion.Meter</th>
+                        <th>@(corectnion.Type == 0 ? "RP" : "AP" )</th>
+                        <th>@( "Рп ,Ап" )</th>
+                        <th>@corectnion.CorrectionValue</th>
+                        <th>@corectnion.coord</th>
+
+                    </tr>
+                }
+            }
+        }
+    }
+    </table>
