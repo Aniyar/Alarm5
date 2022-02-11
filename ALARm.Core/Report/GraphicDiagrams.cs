@@ -429,8 +429,8 @@ namespace ALARm.Core.Report
                 {
 
                 }
-                //  if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
-                //     continue;
+                if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                    continue;
                 var txtX = -sw.Length / 2;
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
                 int end = kilometer.Number == sw.Final_Km ? sw.Final_M : sw.Start_M+ sw.Length;
@@ -526,12 +526,12 @@ namespace ALARm.Core.Report
 
             foreach (var sw in switchesnone)
             {
+                if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                    continue;
                 if (kilometer.Number.ToDoubleCoordinate(Math.Max(kilometer.Start_m, kilometer.Final_m)) < Math.Max(sw.RealStartCoordinate, sw.RealFinalCoordinate))
                     continue;
 
 
-                if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
-                    continue;
 
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
                 int end = kilometer.Number == sw.Final_Km ? sw.Final_M : kilometer.Final_m;
@@ -710,6 +710,10 @@ namespace ALARm.Core.Report
             ref int fourStepOgrCoun,
             ref int otherfourStepOgrCoun)
         {
+            if (kilometer.StationSection.Any())
+            {
+
+            }
             Digression = Digression.OrderBy(o => o.Meter).ToList();
 
             foreach (var note in Digression)
@@ -734,6 +738,8 @@ namespace ALARm.Core.Report
                     int meter = note.Meter.RoundTo10();
                     if (!((meter >= Start.RoundTo10()) && (meter < Number * 100)))
                         meter = Start + 10;
+                    if (kilometer.StationSection.Any())
+                        meter += 10;
                     if (meter <= Start.RoundTo10() + 10)
                         meter += 10;
 
@@ -749,10 +755,14 @@ namespace ALARm.Core.Report
                             new XAttribute("points", $"188,-{ meter + 10} 195,-{ meter + 10} 195,-{note.Meter} 730,-{note.Meter}"),
                             new XAttribute("note1", $"{note.Note().Split(';')[0]}"),
                             new XAttribute("note2", note.Note().Split(';')[1])));
-                        usedTops.Add(meter + 10);
-                        usedTops.Add(meter);
+                     
+                            usedTops.Add(meter + 10);
 
-                        continue;
+                            usedTops.Add(meter);
+
+                       
+                       
+
                     }
 
                     //if (note.DigName.Contains("гр"))
@@ -820,6 +830,7 @@ namespace ALARm.Core.Report
                                                      new XAttribute("fw", note.FontStyle())));
 
                         usedTops.Add(meter);
+                      //  usedTops.Add(meter);
                         continue;
                     }
 
@@ -861,9 +872,12 @@ namespace ALARm.Core.Report
                         continue;
 
                     }
-                    if (note.DigName.Contains("Рнрст"))
+                    if (note.DigName.Any())
                     {
-                        continue;
+                        if (note.DigName.Contains("Рнрст"))
+                        {
+                            continue;
+                        }
                     }
                     if (note.DigName.Contains("ПрУ"))
                     {

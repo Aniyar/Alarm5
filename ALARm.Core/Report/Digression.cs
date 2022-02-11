@@ -294,18 +294,18 @@ namespace ALARm.Core.Report
 
         public string Alert { get; set; } = string.Empty;
         public int DeltaM { get; set; }
-        public int DeltaKM { get; set; } 
+        public int DeltaKM { get; set; }
 
         public string Note()
         {
             if (Alert != string.Empty)
                 return Alert;
-
+            
             static string is2to3String(int degree, bool is2to3)
             {
                 return is2to3 ? degree.ToString() + "b" : degree.ToString();
             }
-
+            
             if (DigName == DigressionName.Gauge10.Name || Digression == DigressionName.Degree3)
                 return string.Empty;
             if (Degree < 4)

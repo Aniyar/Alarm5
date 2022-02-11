@@ -861,8 +861,9 @@ namespace ALARm.Core
             {
                 foreach (var sw in Switches)
                 {
-                    if (sw.Km == Number)
+                    if ((sw.Km == Number ) && (sw.Final_Km == Number ) && (sw.Start_Km == Number))
                         Digressions.Add(new DigressionMark() { Meter = sw.Meter, Alert = $"{sw.Meter} Стрелка № {sw.Num} {(sw.Dir_Id == SwitchDirection.Direct ? "ПШ" : "ПРШ")} {(sw.Side_Id == Side.Left ? "Лев." : "Прав.")} {sw.Mark}" });
+
                 }
 
                 foreach (var curve in Curves)
