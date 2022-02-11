@@ -32,7 +32,6 @@
                 <th style="border-right: 1px solid grey; width: 125px;">Балл</th>
                 <th style="border-right: 1px solid grey; width: 125px;"></th>
 
-
             }
             else if (AppData.ShowDefShpals)
             {
@@ -361,6 +360,11 @@
                     kilometer.DefShpals = kilometer.DefShpals.Where(o => o.Km == kilometer.Number).ToList();
                     foreach (var digression in kilometer.DefShpals.Select((value, i) => new { i, value }))
                     {
+                        digression.value.Put = kilometer.Track_name;
+                        digression.value.Pdb_section = kilometer.PdbSection.Count > 0 ? kilometer.PdbSection[0].ToString() : "";
+                        digression.value.Date = DateTime.Today.ToShortDateString();
+                        digression.value.Fragment = kilometer.Sector;
+                        digression.value.Direction_num = (kilometer.Direction == ALARm.Core.Direction.Direct) ? 1 : -1;
                         int metre = kilometer.Direction == ALARm.Core.Direction.Direct ? digression.value.Meter : kilometer.Length - digression.value.Meter;
                         int pos = currentKMPosition + metre;
                         int index = rowIndex;
@@ -369,12 +373,15 @@
                             <tr style="background:@(CurrentRow == index ? "#75d2ff" : "lightgray")" @onmousedown="@(_ => GoToMark(pos, index))">
                                 <td style="border-right: 1px solid grey; text-align: right; width: 35px;">@rowIndex</td>
                                 <td style="border-right: 1px solid grey; text-align: right; width: 35px;">@kilometer.Number</td>
-                                <td style="border-right: 1px solid grey;  width:35px;text-align:right">@digression.value.Meter</td>
+                                <td style="border-right: 1px solid grey;  width:35px; text-align:right">@digression.value.Meter</td>
+                                <td style="border-right: 1px solid grey;  width:110px; text-align:right">@digression.value.Otst</td>
                                 <td style="border-right: 1px solid grey;   width:90px; text-align:right">@digression.value.Fastening</td>
+                                <td style="border-right: 1px solid grey;  width: 125px; text-align:right">@digression.value.Meropr</td>
                                 <td style="border-right: 1px solid grey; width: 125px;">@digression.value.Notice</td>
                                 <td>
-                                    <AlarmButton Text="" Symbol="" Tooltip="Удалить" OnClick="() => DeleteModal(digression.value, 5)"></AlarmButton>
-                                    <AlarmButton Text="" Symbol="" Tooltip="Фото" OnClick="() => GetImageDefShpals(digression.value, digression.i, 5)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="" Tooltip="Удалить" OnClick="() => DeleteDefShpalClick(digression.value)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="" Tooltip="Редактировать" OnClick="() => ModifyDefShpalClick(digression.value)"></AlarmButton>
+                                    <AlarmButton Text="" Symbol="📷" Tooltip="Фото" OnClick="() => GetImageDefShpals(digression.value, digression.i, 5)"></AlarmButton>
                                 </td>
                             </tr>
                             rowIndex++;
@@ -406,7 +413,7 @@
     </MatDialogContent>
     <MatDialogActions>
         <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateDigression(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { DigressionDeleteDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" OnClick="_=> { DigressionDeleteDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -427,7 +434,7 @@
     </MatDialogContent>
     <MatDialogActions>
         <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateDigression(ALARm.Core.Report.RdAction.Modify);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { DigressionEditDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" OnClick="_=> { DigressionEditDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -441,7 +448,7 @@
     </MatDialogContent>
     <MatDialogActions>
         <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateGap(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { GapDeleteDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" OnClick="_=> { GapDeleteDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -468,12 +475,12 @@
     <MatDialogTitle>Удаление Болта</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@BoltEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@BoltEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateBolt(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { BoltDeleteDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=>  { EditDigression(ALARm.Core.Report.RdAction.Delete, 2, BoltDeleteDialog); }">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { BoltDeleteDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -482,16 +489,16 @@
     <MatDialogTitle>Корректировка болта</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@BoltEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@BoltEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
-        <MatTextField @bind-Value="digressionBolt.Overlay" Label="Накладка" Style="width:45%" Outlined="true"></MatTextField>
-        <MatTextField @bind-Value="digressionBolt.Before" Label="До стыка:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
-        <MatTextField @bind-Value="digressionBolt.After" Label="После стыка:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
-        <MatTextField @bind-Value="digressionBolt.FullSpeed" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="digressionO.Overlay" Label="Накладка" Style="width:45%" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.Before" Label="До стыка:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.After" Label="После стыка:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.FullSpeed" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
 
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateBolt(ALARm.Core.Report.RdAction.Modify);  }">Ок</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> { EditDigression(ALARm.Core.Report.RdAction.Modify, 2, BoltEditDialog); }">Ок</MatButton>
         <MatButton Raised="true" OnClick="_=> { BoltEditDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
@@ -501,12 +508,12 @@
     <MatDialogTitle>Удаление скрепления</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@FastenerEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@FastenerEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateFastener(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { FastenerDeleteDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=>  {EditDigression(ALARm.Core.Report.RdAction.Delete, 3, FastenerDeleteDialog);}">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { FastenerDeleteDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -515,10 +522,10 @@
     <MatDialogTitle>Корректировка скрепления</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@FastenerEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@FastenerEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
-        <MatTextField @bind-Value="digressionFastener.Otst" Label="Отступление" Style="width:45%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options2" TItem="string" @bind-Value="digressionFastener.Threat_id" Label="Сторона" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="digressionO.Otst" Label="Отступление" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options2" TItem="string" @bind-Value="digressionO.Threat_id" Label="Сторона" Style="width:45%" Outlined="true"></MatAutocompleteList>
         @code
         {
             string[] options2 = new[]
@@ -527,11 +534,11 @@
                 "левая"
             };
         }
-        <MatTextField @bind-Value="digressionFastener.Fastening" Label="Скрепление" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.Fastening" Label="Скрепление" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
 
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdateFastener(ALARm.Core.Report.RdAction.Modify);  }">Ок</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {EditDigression(ALARm.Core.Report.RdAction.Modify, 3, FastenerEditDialog);}">Ок</MatButton>
         <MatButton Raised="true" OnClick="_=> { FastenerEditDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
@@ -541,12 +548,12 @@
     <MatDialogTitle>Удаление перпендикулярной шпалы</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@PerShpalEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@PerShpalEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdatePerShpal(ALARm.Core.Report.RdAction.Delete);  }">Ок</MatButton>
-        <MatButton Raised="true" OnClick="_=> { PerShpalDeleteDialog = false;}">Отменить</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {EditDigression(ALARm.Core.Report.RdAction.Delete, 4, PerShpalDeleteDialog);}">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { PerShpalDeleteDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -555,16 +562,49 @@
     <MatDialogTitle>Корректировка перпендикулярной шпалы</MatDialogTitle>
     <MatDialogContent>
         <br />
-        <MatTextField @bind-Value="@PerShpalEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
-        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@PerShpalEditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
-        <MatTextField @bind-Value="PerShpal.Angle" Label="Угол:" Style="width:45%" Outlined="true"></MatTextField>
-        <MatTextField @bind-Value="PerShpal.Fastener" Label="Скрепление:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
-@*        <MatTextField @bind-Value="PerShpal.Vdop" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
-*@
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="digressionO.Angle" Label="Угол:" Style="width:45%" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.Fastener" Label="Скрепление:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        @*        <MatTextField @bind-Value="PerShpal.Vdop" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        *@
     </MatDialogContent>
     <MatDialogActions>
-        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {UpdatePerShpal(ALARm.Core.Report.RdAction.Modify);  }">Ок</MatButton>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {EditDigression(ALARm.Core.Report.RdAction.Modify, 4, PerShpalEditDialog);  }">Ок</MatButton>
         <MatButton Raised="true" OnClick="_=> { PerShpalEditDialog = false;}">Закрыть</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
+
+<MatDialog @bind-IsOpen="@DefShpalDeleteDialog" Stacked="true">
+    <MatDialogTitle>Удаление дефектной шпалы</MatDialogTitle>
+    <MatDialogContent>
+        <br />
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:90%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {EditDigression(ALARm.Core.Report.RdAction.Delete, 5, DefShpalDeleteDialog);}">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { DefShpalDeleteDialog = false;}">Закрыть</MatButton>
+    </MatDialogActions>
+</MatDialog>
+
+
+<MatDialog @bind-IsOpen="@DefShpalEditDialog" Stacked="true">
+    <MatDialogTitle>Корректировка дефектной шпалы</MatDialogTitle>
+    <MatDialogContent>
+        <br />
+        <MatTextField @bind-Value="@DigressionEditor" Label="Редактор" Style="width:45%" Outlined="true"></MatTextField>
+        <MatAutocompleteList Items="@options" TItem="string" @bind-Value="@EditReason" Label="Причина корректировки" Style="width:45%" Outlined="true"></MatAutocompleteList>
+        <MatTextField @bind-Value="digressionO.Otst" Label="Отступление:" Style="width:45%" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.Fastening" Label="Скрепление:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        <MatTextField @bind-Value="digressionO.Meropr" Label="Мероприятие:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        @*        <MatTextField @bind-Value="PerShpal.Vdop" Label="Огр.ск:" Style="width:45%" TextArea="true" Outlined="true"></MatTextField>
+        *@
+    </MatDialogContent>
+    <MatDialogActions>
+        <MatButton Raised="true" Style="margin-right:5px;" OnClick="_=> {EditDigression(ALARm.Core.Report.RdAction.Modify, 5, DefShpalEditDialog);  }">Ок</MatButton>
+        <MatButton Raised="true" OnClick="_=> { DefShpalEditDialog = false;}">Закрыть</MatButton>
     </MatDialogActions>
 </MatDialog>
 
@@ -633,11 +673,11 @@
             <div align="center">
                 <table style="font-size: 16px; font-family: 'Times New Roman'; width: 100%; margin: auto;margin-bottom:8px;border-collapse: collapse">
                     <tr>
-                        <td align="left">@digressionBolt.Pdb_section</td>
-                        <td align="left">@digressionBolt.Fragment</td>
+                        <td align="left">@digressionO.Pdb_section</td>
+                        <td align="left">@digressionO.Fragment</td>
                         <td>
                             Дата проверки:
-                            <b>@digressionBolt.Date</b>
+                            <b>@digressionO.Date</b>
                         </td>
                         <td>Проверка: Дополнительная</td>
 
@@ -645,29 +685,29 @@
                     <tr>
                         <td>
                             Путь:
-                            <b>@digressionBolt.Put</b>
+                            <b>@digressionO.Put</b>
                         </td>
                         <td>
                             Км:
-                            <b>@digressionBolt.Km</b>
+                            <b>@digressionO.Km</b>
                         </td>
                         <td align="left">
                             Метр:
-                            <b>@digressionBolt.Meter</b>
+                            <b>@digressionO.Meter</b>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             Накладка:
-                            <b>@digressionBolt.Overlay</b>
+                            <b>@digressionO.Overlay</b>
                         </td>
                         <td>
                             До стыка:
-                            <b>@digressionBolt.Before</b>
+                            <b>@digressionO.Before</b>
                         </td>
                         <td>
                             После стыка:
-                            <b>@digressionBolt.After</b>
+                            <b>@digressionO.After</b>
                         </td>
                     </tr>
                 </table>
@@ -679,11 +719,11 @@
             <div align="center">
                 <table style="font-size: 16px; font-family: 'Times New Roman'; width: 100%; margin: auto;margin-bottom:8px;border-collapse: collapse">
                     <tr>
-                        <td align="left">@digressionFastener.Pdb_section</td>
-                        <td align="left">@digressionFastener.Fragment</td>
+                        <td align="left">@digressionO.Pdb_section</td>
+                        <td align="left">@digressionO.Fragment</td>
                         <td>
                             Дата проверки:
-                            <b>@digressionFastener.Date</b>
+                            <b>@digressionO.Date</b>
                         </td>
                         <td>Проверка: Дополнительная</td>
 
@@ -691,29 +731,29 @@
                     <tr>
                         <td>
                             Путь:
-                            <b>@digressionFastener.Put</b>
+                            <b>@digressionO.Put</b>
                         </td>
                         <td>
                             Км:
-                            <b>@digressionFastener.Km</b>
+                            <b>@digressionO.Km</b>
                         </td>
                         <td>
                             Метр:
-                            <b>@digressionFastener.Mtr</b>
+                            <b>@digressionO.Mtr</b>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             Отступление:
-                            <b>@digressionFastener.Otst</b>
+                            <b>@digressionO.Otst</b>
                         </td>
                         <td>
                             Сторона:
-                            <b>@digressionFastener.Threat_id</b>
+                            <b>@digressionO.Threat_id</b>
                         </td>
                         <td>
                             Скрепление:
-                            <b>@digressionFastener.Fastening</b>
+                            <b>@digressionO.Fastening</b>
                         </td>
                     </tr>
                 </table>
@@ -725,11 +765,11 @@
             <div align="center">
                 <table style="font-size: 16px; font-family: 'Times New Roman'; width: 100%; margin: auto;margin-bottom:8px;border-collapse: collapse">
                     <tr>
-                        <td align="left">@PerShpal.Pdb_section</td>
-                        <td align="left">@PerShpal.Fragment</td>
+                        <td align="left">@digressionO.Pdb_section</td>
+                        <td align="left">@digressionO.Fragment</td>
                         <td>
                             Дата проверки:
-                            <b>@PerShpal.Date</b>
+                            <b>@digressionO.Date</b>
                         </td>
                         <td>Проверка: Дополнительная</td>
 
@@ -737,27 +777,73 @@
                     <tr>
                         <td>
                             Путь:
-                            <b>@PerShpal.Put</b>
+                            <b>@digressionO.Put</b>
                         </td>
                         <td>
                             Км:
-                            <b>@PerShpal.Km</b>
+                            <b>@digressionO.Km</b>
                         </td>
                         <td>
                             Метр:
-                            <b>@PerShpal.Meter</b>
+                            <b>@digressionO.Meter</b>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             Угол:
-                            <b>@PerShpal.Angle</b>
+                            <b>@digressionO.Angle</b>
                         </td>
                         <td>
                             Скрепление:
-                            <b>@digressionFastener.Fastener</b>
+                            <b>@digressionO.Fastener</b>
                         </td>
                         <td></td>
+                    </tr>
+                </table>
+            </div>
+        }
+
+        @if (AppData.ShowDefShpals)
+        {
+            <div align="center">
+                <table style="font-size: 16px; font-family: 'Times New Roman'; width: 100%; margin: auto;margin-bottom:8px;border-collapse: collapse">
+                    <tr>
+                        <td align="left">@digressionO.Pdb_section</td>
+                        <td align="left">@digressionO.Fragment</td>
+                        <td>
+                            Дата проверки:
+                            <b>@digressionO.Date</b>
+                        </td>
+                        <td>Проверка: Дополнительная</td>
+
+                    </tr>
+                    <tr>
+                        <td>
+                            Путь:
+                            <b>@digressionO.Put</b>
+                        </td>
+                        <td>
+                            Км:
+                            <b>@digressionO.Km</b>
+                        </td>
+                        <td>
+                            Метр:
+                            <b>@digressionO.Meter</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Отступление:
+                            <b>@digressionO.Otst</b>
+                        </td>
+                        <td>
+                            Скрепление:
+                            <b>@digressionO.Fastening</b>
+                        </td>
+                        <td>
+                            Мероприятие:
+                            <b>@digressionO.Meropr</b>
+                        </td>
                     </tr>
                 </table>
             </div>
