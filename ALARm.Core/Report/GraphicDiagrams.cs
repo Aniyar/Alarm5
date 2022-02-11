@@ -429,13 +429,13 @@ namespace ALARm.Core.Report
                 {
 
                 }
-              //  if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
-               //     continue;
-
-                int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
-                int end = kilometer.Number == sw.Final_Km ? sw.Final_M : kilometer.Final_m;
-
+                //  if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                //     continue;
                 var txtX = -sw.Length / 2;
+                int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
+                int end = kilometer.Number == sw.Final_Km ? sw.Final_M : sw.Start_M+ sw.Length;
+
+             
 
                 //Стрелка жогарыдан сызу
                 if (sw.Dir_Id == SwitchDirection.Reverse)

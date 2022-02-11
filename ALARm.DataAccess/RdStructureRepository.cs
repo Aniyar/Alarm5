@@ -3831,18 +3831,36 @@ namespace ALARm.DataAccess
 	            //typ > 1 order by meter").ToList();
 
 
+             //   if (db.State == ConnectionState.Closed)
+             //       db.Open();
+             //   return db.Query<DigressionMark>($@"
+             //   select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
+             //   uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
+	            //CASE
+             //   WHEN primech='Натурная кривая' THEN ots
+             //   ELSE ''
+             //   END 
+             //   AS alert
+             //   from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}  and 
+	            //typ > 1 order by meter").ToList();
+
                 if (db.State == ConnectionState.Closed)
                     db.Open();
                 return db.Query<DigressionMark>($@"
-                select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
+                SELECT DISTINCT  
+	 
+                min(id) as id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
                 uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
 	            CASE
                 WHEN primech='Натурная кривая' THEN ots
                 ELSE ''
                 END 
                 AS alert
-                from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}  and 
-	            typ > 1 order by meter").ToList();
+                from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}   and 
+	            typ > 1
+                GROUP BY track_id, trip_id, km, typ, len, otkl, kol, ots, ovp, ogp, uv, uvg, is2to3, isequalto3, isequalto4, onswitch, islong, primech, meter
+                ORDER BY
+	                meter").ToList();
             }
         }
         /// <summary>
