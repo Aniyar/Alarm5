@@ -1565,13 +1565,15 @@ namespace ALARm.Core
                         //try
                         //{
 
-                          
-                        //        delta1 = Math.Abs(HeadX - item.X[item.Y.IndexOf(SelectedData.First())]);
-                        //        delta2 = Math.Abs(HeadX2 - item.X[item.Y.IndexOf(SelectedData.Last())]);
-                        //        if (delta1 > 1.5 * delta2  && delta1 > 100)
-                        //            HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - delta2;
-                        //        if (delta2 > 1.5 * delta1 & delta2 > 110)
-                        //            HeadX2 = item.X[item.Y.IndexOf(SelectedData.Last())] + delta1;
+                        if (Math.Abs(item.Y[Head2]) < 10 && (Points_manyR_str_LeftY.Count < 1 && Points_manyR_str_RightY.Count < 1))
+                        {
+                            delta1 = Math.Abs(HeadX - item.X[item.Y.IndexOf(SelectedData.First())]);
+                            delta2 = Math.Abs(HeadX2 - item.X[item.Y.IndexOf(SelectedData.Last())]);
+                            if (delta2 > 1.5 * delta1 && delta1 < 30)
+                                HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - delta2;
+                            if (delta1 > 1.5 * delta2 & delta2 < 30)
+                                HeadX2 = item.X[item.Y.IndexOf(SelectedData.Last())] + delta1;
+                        }
                             
                         //    if (delta1 > 100)
                         //        HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - (int)(0.7 * delta1);
