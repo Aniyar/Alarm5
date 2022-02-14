@@ -4313,7 +4313,7 @@ namespace ALARm.DataAccess
                     var prevPoint = kilometer.Point;
                     if (action == RdAction.Delete)
                     {
-                        command.CommandText = $"DELETE FROM report_gaps WHERE report_gaps = {dGap.id}";
+                        command.CommandText = $"DELETE FROM report_gaps WHERE report_gaps.id = {dGap.id}";
                         command.ExecuteNonQuery();
                         kilometer.Gaps.Remove(dGap);
                     }
@@ -4328,27 +4328,6 @@ namespace ALARm.DataAccess
                         command.ExecuteNonQuery();
                     }
                     kilometer.CalcPoint();
-
-                    /*if (prevPoint != kilometer.Point)
-                    {
-                        command.CommandText = $@"
-                        INSERT INTO bedemost_history(
-                            original_id, km, ball, ots_iv_st, primech)
-                        SELECT
-                            id, km, ball, ots_iv_st, primech from bedemost
-                        WHERE 
-                            km = {dGap.Km} and track_id = {dGap.TrackId} and trip_id = {dGap.TripId}
-                        ";
-                        command.ExecuteNonQuery();
-                        command.CommandText = $@"
-                        UPDATE bedemost
-                            SET ball = {kilometer.Point}, ots_iv_st = '{dGap.LimitSpeedToString()}'
-                        WHERE 
-                            km = {dGap.Km} and track_id = {dGap.TrackId} and trip_id = {dGap.TripId}
-                        ";
-                        command.ExecuteNonQuery();
-                    }*/
-
                     transaction.Commit();
                     return 1;
                 }
@@ -4369,41 +4348,112 @@ namespace ALARm.DataAccess
             return -1;
         }
 
-        public int UpdateBoltBase(Digression bolt, Kilometer kilometer, RdAction action)
+
+        public int UpdateDigressionBase(Digression digression, int type, Kilometer kilometer, RdAction action)
         {
             using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
             {
                 if (db.State == ConnectionState.Closed)
                     db.Open();
                 NpgsqlTransaction transaction = (NpgsqlTransaction)db.BeginTransaction();
-                var command = new NpgsqlCommand();
-                command.Connection = (NpgsqlConnection)db;
-                command.Transaction = transaction;
+                var command_hist = new NpgsqlCommand();
+                command_hist.Connection = (NpgsqlConnection)db;
+                command_hist.Transaction = transaction;
+                var command_edit = new NpgsqlCommand();
+                command_edit.Connection = (NpgsqlConnection)db;
+                command_edit.Transaction = transaction;
+                var command_del = new NpgsqlCommand();
+                command_del.Connection = (NpgsqlConnection)db;
+                command_del.Transaction = transaction;
                 try
                 {
-                    command.CommandText = $@"
-                    INSERT INTO report_bolts_history(original_id,trip_id,modi_date,pchu,station,km,piket,meter,before,after,speed,notice,fnum,ms,fullspeed,overlay,fileid,fastening,threat,note,editor,editreason,action)
-                    SELECT
-                       id, trip_id, CURRENT_TIMESTAMP, pchu,station,km,piket,meter,before,after,speed,notice,fnum,ms,fullspeed,overlay,fileid,fastening,threat,note,'{bolt.Editor}', '{bolt.EditReason}', {(int)action}
-                    FROM report_bolts WHERE report_bolts.id = {bolt.Id}
-                    ";
-                    command.ExecuteNonQuery();
+                    switch (type)
+                    {
+                        case 2:
+                            command_hist.CommandText = $@"
+                                INSERT INTO report_bolts_history(original_id,trip_id,modi_date,pchu,station,km,piket,meter,before,after,speed,notice,fnum,ms,fullspeed,overlay,fileid,fastening,threat,note,editor,editreason,action)
+                                SELECT
+                                   id, trip_id, CURRENT_TIMESTAMP, pchu,station,km,piket,meter,before,after,speed,notice,fnum,ms,fullspeed,overlay,fileid,fastening,threat,note,'{digression.Editor}', '{digression.EditReason}', {(int)action}
+                                FROM report_bolts WHERE report_bolts.id = {digression.Id}
+                                ";
+                            command_edit.CommandText = $@"
+                                UPDATE report_bolts
+                                    SET before = {digression.Before}, after = {digression.After}, overlay = '{digression.Overlay}', fullspeed = '{digression.FullSpeed}', modi_date=CURRENT_TIMESTAMP
+                                WHERE 
+                                    id = {digression.Id}
+                                ";
+                            command_del.CommandText = $"DELETE FROM report_bolts WHERE report_bolts.id = {digression.Id}";
+                            break;
+                        case 3:
+                            command_hist.CommandText = $@"
+                                INSERT INTO report_badfasteners_history(state,trip_id,modi_date,user_id,pchu,station,km,mtr,otst,threat_id,fastening,notice,fnum,ms,fileid,original_id,editor,edit_reason,action)
+                                SELECT
+                                    state,trip_id,CURRENT_TIMESTAMP,user_id,pchu,station,km,mtr,otst,threat_id,fastening,notice,fnum,ms,fileid,id,'{digression.Editor}', '{digression.EditReason}', {(int)action}
+                                FROM report_badfasteners WHERE report_badfasteners.id = {digression.Id}
+                                ";
+                            command_edit.CommandText = $@"
+                                UPDATE report_badfasteners
+                                    SET otst = '{digression.Otst}', threat_id = '{digression.Threat_id}', fastening = '{digression.Fastening}', modi_date=CURRENT_TIMESTAMP
+                                WHERE 
+                                    id = {digression.Id}
+                                ";
+                            command_del.CommandText = $"DELETE FROM report_badfasteners WHERE report_badfasteners.id = {digression.Id}";
+                            break;
+                        case 4:
+                            command_hist.CommandText = $@"
+                                INSERT INTO report_violperpen_history(trip_id,km,meter,vdop,angle,fastener,file_id,fnum,ms,original_id,editor,edit_reason,modi_date,action)
+                                SELECT
+                                    trip_id,km,meter,vdop,angle,fastener,file_id,fnum,ms,id,'{digression.Editor}', '{digression.EditReason}', CURRENT_TIMESTAMP, {(int)action}
+                                FROM report_violperpen WHERE report_violperpen.id = {digression.Id}
+                                ";
+                            command_edit.CommandText = $@"
+                                UPDATE report_violperpen
+                                    SET angle = '{digression.Angle}', fastener = '{digression.Fastener}'
+                                WHERE 
+                                    id = {digression.Id}
+                                ";
+                            command_del.CommandText = $"DELETE FROM report_violperpen WHERE report_violperpen.id = {digression.Id}";
+                            break;
+                        case 5:
+                            command_hist.CommandText = $@"
+                                INSERT INTO report_defshpal_history(state,trip_id,modi_date,user_id,pchu,station,km,meter,otst,fastening,meropr,notice,fnum,ms,file_id,original_id,editor,edit_reason,action)
+                                SELECT
+                                    state,trip_id,CURRENT_TIMESTAMP,user_id,pchu,station,km,meter,otst,fastening,meropr,notice,fnum,ms,file_id,id,'{digression.Editor}', '{digression.EditReason}',{(int)action}
+                                FROM report_defshpal WHERE report_defshpal.id = {digression.Id}
+                                ";
+                            command_edit.CommandText = $@"
+                                UPDATE report_defshpal
+                                    SET otst = '{digression.Otst}', fastening = '{digression.Fastening}', meropr = '{digression.Meropr}', notice = '{digression.Notice}', modi_date = CURRENT_TIMESTAMP 
+                                WHERE 
+                                    id = {digression.Id}
+                                ";
+                            command_del.CommandText = $"DELETE FROM report_defshpal WHERE report_defshpal.id = {digression.Id}";
+                            break;
+                    }
+                    command_hist.ExecuteNonQuery();
                     var prevPoint = kilometer.Point;
                     if (action == RdAction.Delete)
                     {
-                        command.CommandText = $"DELETE FROM report_bolts WHERE report_bolts = {bolt.Id}";
-                        command.ExecuteNonQuery();
-                        kilometer.Bolts.Remove(bolt);
+                        command_del.ExecuteNonQuery();
+                        switch (type)
+                        {
+                            case 2:
+                                kilometer.Bolts.Remove(digression);
+                                break;
+                            case 3:
+                                kilometer.Fasteners.Remove(digression);
+                                break;
+                            case 4:
+                                kilometer.PerShpals.Remove(digression);
+                                break;
+                            case 5:
+                                kilometer.DefShpals.Remove(digression);
+                                break;
+                        }
                     }
                     else
                     {
-                        command.CommandText = $@"
-                        UPDATE report_bolts
-                            SET before = {bolt.Before}, after = {bolt.After}, overlay = '{bolt.Overlay}', fullspeed = '{bolt.FullSpeed}', modi_date=CURRENT_TIMESTAMP
-                        WHERE 
-                            id = {bolt.Id}
-                        ";
-                        command.ExecuteNonQuery();
+                        command_edit.ExecuteNonQuery();
                     }
                     kilometer.CalcPoint();
                     transaction.Commit();
@@ -4412,7 +4462,7 @@ namespace ALARm.DataAccess
                 catch (Exception e)
                 {
                     transaction.Rollback();
-                    Console.WriteLine($"UpdateBolt error: {e.Message}");
+                    Console.WriteLine($"UpdateDigression error: {e.Message}");
                     return -1;
 
                 }
@@ -4420,37 +4470,6 @@ namespace ALARm.DataAccess
                 {
                     db.Close();
                 }
-
-
-            }
-            return -1;
-        }
-
-        public void RemoveDigression(int id, int type)
-        {
-            var query = "";
-            if (type == 1)
-            {
-                query = $"DELETE FROM report_gaps WHERE id = {id}";
-            } else if (type == 2)
-            {
-                query = $"DELETE FROM report_bolts WHERE id = {id}";
-            } else if (type == 3)
-            {
-                query = $"DELETE FROM report_badfasteners WHERE id = {id}";
-            } else if (type == 4)
-            {
-                query = $"DELETE FROM report_violperpen WHERE id = {id}";
-            } else
-            {
-                query = $"DELETE FROM report_defshpal WHERE id = {id}";
-            }
-            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
-            {
-                if (db.State == ConnectionState.Closed)
-                    db.Open();
-
-                db.Execute(query);
             }
         }
 

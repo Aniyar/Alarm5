@@ -34,6 +34,7 @@ namespace ALARm.Core.AdditionalParameteres
         public int Razn { get; set; }
         public Threat Threat { get; set; }
 
+        public int Ball { get; set; }
         public int Zazor { get; set; }
         public int Y { get; set; }
         public int Y2 { get; set; }
