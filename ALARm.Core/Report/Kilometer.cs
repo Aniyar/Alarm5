@@ -525,6 +525,8 @@ namespace ALARm.Core
         public int CorrectionMeter { get; set; } = -1;
         public CorrectionType CorrectionType { get; set; } = CorrectionType.None;
         public List<DigressionMark> Digressions { get; set; } = new List<DigressionMark>();
+
+        public List<CorrectionNote> CorrectionNotes = new List<CorrectionNote>();
         public List<Gap> Gaps { get; set; } = new List<Gap>();
         public List<Digression> Bolts { get; set; } = new List<Digression>();
         public List<Digression> Fasteners { get; set; } = new List<Digression>();
@@ -973,6 +975,7 @@ namespace ALARm.Core
                                Meter = coord,
                                Alert = $"{coord} Привязка координат: {(CorrectionType == CorrectionType.Manual ? "РП" : "АП")} коррекция; начальной привязки на {CorrectionValue}   метр"
                            }) ;
+                        var ANIAYRAMOLODEC = rdStructureRepository.InsertCorrection(trip.Id, Track_id, Number, coord, CorrectionValue);
 
                     }
                 }

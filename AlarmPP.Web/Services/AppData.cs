@@ -393,6 +393,7 @@ namespace AlarmPP.Web.Services
         {
             if (Kilometers == null)
                 Kilometers = new List<Kilometer>();
+
             foreach (var fragment in Trip.Route)
             {
                 var kms = MainTrackStructureRepository.GetKilometersOfFragment(fragment, DateTime.Today, fragment.Direction, Trip.Id);
@@ -414,6 +415,7 @@ namespace AlarmPP.Web.Services
 
                 foreach (var km in kms)
                 {
+                    var coord = km.Final_m;
                     if (km.Number == 711)
                     {
                         km.Number = km.Number;
@@ -485,11 +487,21 @@ namespace AlarmPP.Web.Services
                         if (km.IsPrinted)
                         {
                             km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] { 2, 3, 4 });
+                            km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
                             km.Fasteners = AdditionalParametersRepository.Check_badfastening_state(Trip.Id, 999);
                             km.DefShpals = AdditionalParametersRepository.Check_defshpal_state(Trip.Id, 999);
                             km.PerShpals = AdditionalParametersRepository.Check_ViolPerpen(Trip.Id);
+                            //if (!km.CorrectionNotes.Any())
+                            //{
+                            //    km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
+                            //}
+                            //else
+                            //{
+                            //    continue;
+                            //}
+
                         }
 
                         Kilometers.Add(km);
