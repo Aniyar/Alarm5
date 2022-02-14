@@ -503,7 +503,11 @@
                 <PointChart ViewBox="@AppData.ViewBoxRight" DownHill="@AppData.DownHillRightValue" Tilt="@AppData.TiltRightValue" Side="Side.Right" Points="@AppData.PointsRight" NominalRail="@AppData.NominalRailScheme" NominalRailRotate="@AppData.NominalRotateRight" NominalRailTranslate="@AppData.NominalTranslateRight" Width="400" Heigth="400" Style="@($"transform:rotate(-{AppData.CalibrConstRight}deg);")" />
             </p>
         </div>
+
     }
+    <div class="float-left">
+        <Alarmcheck kilometers="@AppData.Kilometers"></Alarmcheck>
+    </div>
 </div>
 <MatDialog @bind-IsOpen="@StopDialog" Stacked="true">
     <MatDialogContent>Завершить проезд?</MatDialogContent>

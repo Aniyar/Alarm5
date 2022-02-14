@@ -3246,6 +3246,7 @@ namespace ALARm.DataAccess
                     db.Open();
                 db.Execute($"Delete from s3 where trip_id = '{trip_id}'");
                 db.Execute($"Delete from bedemost where trip_id = '{trip_id}'");
+          
 
             }
         }
@@ -3970,6 +3971,59 @@ namespace ALARm.DataAccess
             }
             return -1;
         }
+
+        public int InsertCorrection(long trip_id, int track_id, int Number, int coord, int CorrectionValue)
+        //public int InsertCorrection(long trip_id, int track_id, int Number, int coord, string CorrectionType, int CorrectionValue)
+        //public int InsertCorrection(trip.Id, Track_id, Number, coord, $"{coord} Привязка координат: {(CorrectionType == CorrectionType.Manual ? "РП" : "АП")} коррекция; начальной привязки на {CorrectionValue}   метр")
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                NpgsqlTransaction transaction = (NpgsqlTransaction)db.BeginTransaction();
+                var command = new NpgsqlCommand();
+                command.Connection = (NpgsqlConnection)db;
+                command.Transaction = transaction;
+                try
+                {
+                    command.CommandText = $@"
+                    INSERT INTO s3_correction(
+	                 trip_id,track_id,km,coord,correctionvalue)
+                    VALUES
+                        ({trip_id} ,{track_id}, {Number}, {coord}, {CorrectionValue} ) ";
+                    command.ExecuteNonQuery();
+                    //var prevPoint = kilometer.Point;
+
+                    transaction.Commit();
+                    return 1;
+                }
+                catch (Exception e)
+                {
+                    transaction.Rollback();
+                    Console.WriteLine($"UpdateDigression error: {e.Message}");
+                    return -1;
+
+                }
+                finally
+                {
+                    db.Close();
+                }
+
+
+            }
+        }
+        public List<CorrectionNote> GetCorrectionNotes(long trip_id, int Track_id, int Number, int coord, int CorrectionValue)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+
+                //return db.Query<CorrectionNote>($@"select  * from s3_correction where km={Number} ").ToList();
+                return db.Query<CorrectionNote>($@"select distinct km,trip_id,track_id,correctionvalue,coord from s3_correction where km={Number} GROUP BY  km,trip_id,track_id,correctionvalue,coord ").ToList();
+            }
+        }
+
 
         public List<NotCheckedKm> GetDop2(long trip_id, long distId)
         {

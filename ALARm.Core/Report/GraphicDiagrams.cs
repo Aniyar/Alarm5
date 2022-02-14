@@ -429,7 +429,12 @@ namespace ALARm.Core.Report
                 {
 
                 }
-                if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                //if (sw.Start_Km != kilometer.Number && sw.Final_Km != kilometer.Number)
+                //    continue;
+
+                if (sw.Start_M > kilometer.Final_m)
+                    continue;
+                if (sw.Start_M < kilometer.Start_m)
                     continue;
                 var txtX = -sw.Length / 2;
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
@@ -530,7 +535,7 @@ namespace ALARm.Core.Report
                     continue;
                 if (kilometer.Number.ToDoubleCoordinate(Math.Max(kilometer.Start_m, kilometer.Final_m)) < Math.Max(sw.RealStartCoordinate, sw.RealFinalCoordinate))
                     continue;
-
+               
 
 
                 int ostryak = kilometer.Number == sw.Start_Km ? sw.Start_M : 0;
@@ -739,7 +744,7 @@ namespace ALARm.Core.Report
                     if (!((meter >= Start.RoundTo10()) && (meter < Number * 100)))
                         meter = Start + 10;
                     if (kilometer.StationSection.Any())
-                        meter += 10;
+                        meter = Start + 20;
                     if (meter <= Start.RoundTo10() + 10)
                         meter += 10;
 
@@ -854,7 +859,7 @@ namespace ALARm.Core.Report
                         }
                         continue;
                     }
-                    if (note.Note().Contains("Стрелка"))
+                    if (note.Note().Contains("Стрелка")&& note.Meter > kilometer.Start_m)
                     {
                         digElements.Add(new XElement("rect",
                                                     new XAttribute("top", -meter - 9),
