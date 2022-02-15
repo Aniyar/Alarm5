@@ -822,7 +822,7 @@ object MainDataModule: TMainDataModule
   object pgsConnection: TFDConnection
     Params.Strings = (
       'User_Name=postgres'
-      'Database=railway'
+      'Database=railway_comp'
       'Password=alhafizu'
       'Server=DESKTOP-EMAFC5J'
       'ExtendedMetadata=True'

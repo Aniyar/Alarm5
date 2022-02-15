@@ -203,7 +203,7 @@ namespace GapService
 
                 return base.StartAsync(cancellationToken);
             }
-            catch
+            catch(Exception e)
             {
                 StartAsync(cancellationToken);
                 return base.StartAsync(cancellationToken);

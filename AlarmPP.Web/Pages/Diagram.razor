@@ -66,11 +66,11 @@
                                 </MatListItem>
 
                                 @*<MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.DangerousForEmtyWagon))">
-                                    <MatCheckbox Value="@AppData.ShowDangerousForEmtyWagon" Label="Опасные для порожных вагонов" Style="color:hotpink;width:100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.DangerousForEmtyWagon))"></MatCheckbox>
-                                </MatListItem>*@
+            <MatCheckbox Value="@AppData.ShowDangerousForEmtyWagon" Label="Опасные для порожных вагонов" Style="color:hotpink;width:100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.DangerousForEmtyWagon))"></MatCheckbox>
+        </MatListItem>*@
 
                                 <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.CloseToDangerous))">
-                                    <MatCheckbox Value="@AppData.ShowCloseToDangerous" Label="Близкие к опасным" Style="color: red; width: 100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.CloseToDangerous))"></MatCheckbox>
+                                    <MatCheckbox Value="@AppData.ShowCloseToDangerous" Label="Отступления близкие к опасным" Style="color: red; width: 100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.CloseToDangerous))"></MatCheckbox>
                                 </MatListItem>
                                 <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.ThirdDegreeDigressions))">
                                     <MatCheckbox Value="@AppData.Show3DegreeDigressions" Label="Отступления 3 степени" Style="color: red; width: 100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.ThirdDegreeDigressions))"></MatCheckbox>
@@ -93,13 +93,12 @@
                                 <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.ExcludedByOerator))">
                                     <MatCheckbox Value="@AppData.ShowExcludedByOerator" Label="Исключеннные оператором" Style="color:orange; width:100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.ExcludedByOerator))"></MatCheckbox>
                                 </MatListItem>
-                                @* ////.........новые кнопки*@
-                                <!--<MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.NotTakenOnRating))">
-                                    <MatCheckbox Value="@AppData.ShowNotTakenOnRating" Label="Отступления 3 степени" Style="color:black; width:100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.NotTakenOnRating))"></MatCheckbox>
-                                </MatListItem>-->
                                 @* ////.........*@
                                 <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.Gaps))">
                                     <MatCheckbox Value="@AppData.ShowGaps" Label="Стыковые зазоры" Style="color:blue; width:100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.Gaps))"></MatCheckbox>
+                                </MatListItem>
+                                <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.GapCloseToDangerous))">
+                                    <MatCheckbox Value="@AppData.ShowGapsCloseToDangerous" Label="Стыковые зазоры, близкие к опасным" Style="color: red; width: 100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.GapCloseToDangerous))"></MatCheckbox>
                                 </MatListItem>
                                 <MatListItem OnClick="(_ => SetShowStatus(Services.ShowButtons.Bolts))">
                                     <MatCheckbox Value="@AppData.ShowBolts" Label="Болты" Style="color: blue; width: 100%;" ValueChanged="@((bool value) => SetShowStatus(Services.ShowButtons.Bolts))"></MatCheckbox>

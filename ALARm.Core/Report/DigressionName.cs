@@ -47,7 +47,7 @@
         public static DigName Level150 = new DigName() { Name = "У150", Value = 30 };
         public static DigName Level75 = new DigName() { Name = "У75", Value = 31 };
 
-        public static DigName gr = new DigName() { Name = "Р", Value = 100 };
+        public static DigName gr = new DigName() { Name = "гр", Value = 100 };
 
         public static DigName ShortWaveLeft = new DigName() { Name = "КВ.л", Value = 101 };
         public static DigName ShortWaveRight = new DigName() { Name = "КВ.п", Value = 102 }; // кн
