@@ -1029,7 +1029,11 @@ namespace ALARm.DataAccess
                                             ", commandType: CommandType.Text).ToList();
 
                     gaps = gaps.Where(o => Math.Abs(o.Zabeg) < 500).ToList();
-
+                    foreach (Gap gap in gaps){
+                        gap.R_zazor = (int)(gap.R_zazor / 1.4);
+                        gap.Zazor = (int)(gap.Zazor / 1.4);
+                        gap.Zabeg = (int)(gap.Zabeg / 1.4);
+                    }
                     return gaps;
                 }
                 catch (Exception e)

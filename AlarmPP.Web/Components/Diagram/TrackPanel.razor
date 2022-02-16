@@ -460,7 +460,7 @@
     <div style="float:left; height:100%">
         @if (AppData != null && AppData.Data != null)
         {
-            <p>@AppData.Data[(int)Services.Series.Section]</p>
+        <p>@AppData.Data[(int)Services.Series.Section] Путь: @AppData.Kilometers[0].Track_name Км: @AppData.CurrentKm М:@AppData.CurrentKmMeter</p>
         }
         <DigressionTable @ref="digressionTable" Kilometers="@AppData.Kilometers"></DigressionTable>
     </div>
