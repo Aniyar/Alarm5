@@ -346,27 +346,27 @@ namespace AlarmPP.Web.Services
         /// <summary>
         /// показать отступления
         /// </summary>
-        public bool ShowDigressions { get; set; }
-        public bool ShowDangerousDigressions { get; set; }
-        public bool ShowDangerousForEmtyWagon { get; set; }
-        public bool Show3DegreeDigressions { get; set; }
-        public bool ShowCloseToDangerous { get; set; }
-        public bool ShowCloseTo2Degree { get; set; }
+        public bool ShowDigressions { get; set; } = false;
+        public bool ShowDangerousDigressions { get; set; } = false;
+        public bool ShowDangerousForEmtyWagon { get; set; } = false;
+        public bool Show3DegreeDigressions { get; set; } = false;
+        public bool ShowCloseToDangerous { get; set; } = false;
+        public bool ShowCloseTo2Degree { get; set; } = false;
 
-        public bool FirstDegreeDigression { get; set; }
-        public bool Show2DegreeDigressions { get; set; }
-        public bool Show1DegreeDigressions { get; set; }
-        public bool ShowOthersDigressions { get; set; }
-        public bool ShowExcludedOnSwitch { get; set; }
-        public bool ShowExcludedByOerator { get; set; }
-        public bool ShowNotTakenOnRating { get; set; }
-        public bool DigressionChecked { get; set; }
-        public bool ShowGaps { get; set; }
-        public bool ShowGapsCloseToDangerous {get; set;}
-        public bool ShowBolts { get; set; }
-        public bool ShowFasteners { get; set; }
-        public bool ShowPerShpals { get; set; }
-        public bool ShowDefShpals { get; set; }
+        public bool FirstDegreeDigression { get; set; } = false;
+        public bool Show2DegreeDigressions { get; set; } = false;
+        public bool Show1DegreeDigressions { get; set; } = false;
+        public bool ShowOthersDigressions { get; set; } = false;
+        public bool ShowExcludedOnSwitch { get; set; } = false;
+        public bool ShowExcludedByOerator { get; set; } = false;
+        public bool ShowNotTakenOnRating { get; set; } = false;
+        public bool DigressionChecked { get; set; } = false;
+        public bool ShowGaps { get; set; } = false;
+        public bool ShowGapsCloseToDangerous {get; set; } = false;
+        public bool ShowBolts { get; set; } = false;
+        public bool ShowFasteners { get; set; } = false;
+        public bool ShowPerShpals { get; set; } = false;
+        public bool ShowDefShpals { get; set; } = false;
         public int GetDistanceFrom1div(int div, float degKoef) {
             var res = 1f / div * degKoef;
             return Convert.ToInt32(res);
