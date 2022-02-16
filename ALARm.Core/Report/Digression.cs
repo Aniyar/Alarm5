@@ -1141,7 +1141,7 @@ namespace ALARm.Core.Report
                         case int sag when sag >= 17: index = 10; break;
                     }
                     break;
-                case int speed when speed.Between(61, 120) && !(FreightSpeedAllow.Between(61,90) && Length <10):
+                case int speed when speed.Between(61, 120) && !(FreightSpeedAllow.Between(61,90) && Length <11):
                     switch ((int)Value)
                     {
                         case 11: index = 0; break;
@@ -1158,7 +1158,7 @@ namespace ALARm.Core.Report
                         case int sag when sag >= 21: index = 10; break;
                     }
                     break;
-                case int speed when speed.Between(61, 120) && (FreightSpeedAllow.Between(61, 90) && Length < 10):
+                case int speed when speed.Between(61, 120) && (FreightSpeedAllow.Between(61, 90) && Length < 11):
                     switch ((int)Value)
                     {
                         case 11: index = 0; break;
