@@ -2571,7 +2571,7 @@ namespace ALARm.DataAccess
                 SELECT trip.*, direction.name as direction_name FROM trips as trip 
                 INNER JOIN adm_direction as direction on direction.id = trip.direction_id
                 WHERE
-                  trip.id = 240
+                  trip.id = 242
                   --current = true 
                   order by id desc limit 1";
                 
@@ -3327,6 +3327,7 @@ namespace ALARm.DataAccess
                         s3.ogp as freightspeedlimit, 
                         s3.isadditional as IsAdditional, 
                         s3.fileid as FileId, 
+                        s3.primech as comment,
                         s3.ms as Ms, 
                         s3.fnum as FNum, s3.reptype as RepType, s3.carposition as CarPosition
                     FROM
@@ -3818,33 +3819,6 @@ namespace ALARm.DataAccess
         {
             using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
             {
-             //   if (db.State == ConnectionState.Closed)
-             //       db.Open();
-             //   return db.Query<DigressionMark>($@"
-             //   select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
-             //   uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
-	            //CASE
-             //   WHEN primech='Натурная кривая' THEN ots
-             //   ELSE ''
-             //   END 
-             //   AS alert
-             //   from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km} and isadditional = 0 and 
-	            //typ > 1 order by meter").ToList();
-
-
-             //   if (db.State == ConnectionState.Closed)
-             //       db.Open();
-             //   return db.Query<DigressionMark>($@"
-             //   select id, track_id as trackid, trip_id as tripId, km, meter, typ as degree, len length, otkl as value, kol as count, ots as digname, ots as digression, ovp as passengerspeedlimit, ogp as freightspeedlimit, 
-             //   uv as passengerspeedallow, uvg as freightspeedallow, is2to3, isequalto3, isequalto4, onswitch, islong, primech as comment,
-	            //CASE
-             //   WHEN primech='Натурная кривая' THEN ots
-             //   ELSE ''
-             //   END 
-             //   AS alert
-             //   from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}  and 
-	            //typ > 1 order by meter").ToList();
-
                 if (db.State == ConnectionState.Closed)
                     db.Open();
                 return db.Query<DigressionMark>($@"
@@ -3858,8 +3832,8 @@ namespace ALARm.DataAccess
                 END 
                 AS alert
                 from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}   and 
-	            typ > 1
-                GROUP BY track_id, trip_id, km, typ, len, otkl, kol, ots, ovp, ogp, uv, uvg, is2to3, isequalto3, isequalto4, onswitch, islong, primech, meter
+	            typ > 0
+                GROUP BY track_id, trip_id, km, typ, len, otkl, kol, ots, ovp, ogp, uv, uvg, is2to3, isequalto3, isequalto4, onswitch, islong, comment, meter
                 ORDER BY
 	                meter").ToList();
             }

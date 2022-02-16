@@ -65,7 +65,7 @@ namespace AlarmPP.Web.Services
         public int PasportPosition { get; set; } = 0;
         public int PasportWidth = 60;
         public List<double> Koefs { get; set; } = new List<double> { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-        
+
         /// <summary>
         /// основные данные для показа текущих значений графиков
         /// Индексы:
@@ -77,13 +77,13 @@ namespace AlarmPP.Web.Services
         /// Показать стыки
         /// </summary>
         /// 
-        
-        
+
+
         public bool ShowJoints { get; set; }
         /// <summary>
         /// показать поперечный профиль рельса
         /// </summary>
-        public bool ShowRailProfile{ get; set; }
+        public bool ShowRailProfile { get; set; }
         /// <summary>
         /// начальная позиция столбца стыков
         /// </summary>
@@ -116,7 +116,7 @@ namespace AlarmPP.Web.Services
         {
             get { return VertWearLeftPosition + WearWidth; }
         }
-       /// <summary>
+        /// <summary>
         /// начальная позиция столбца "Износ прив. Л."
         /// </summary>
         public int GivenWearLeftPosition
@@ -189,7 +189,7 @@ namespace AlarmPP.Web.Services
                 return (ShowMainParams ? MainParamsPosition + MainParamsWidth : MainParamsPosition);
             }
         }
-      
+
         /// <summary>
         /// ширина забега
         /// </summary>
@@ -231,7 +231,7 @@ namespace AlarmPP.Web.Services
             get { return SpeedPosition + SpeedWidth; }
         }
 
-        
+
         /// <summary>
         /// ширина столбца "события"
         /// </summary>
@@ -248,14 +248,14 @@ namespace AlarmPP.Web.Services
         /// <summary>
         /// показать паспортные данные
         /// </summary>
-        public bool ShowPasport {get;set;}
+        public bool ShowPasport { get; set; }
         /// <summary>
         /// показать нулевые линии
         /// </summary>
         public bool ShowZeroLines { get; set; }
-       /// <summary>
-       /// показать основные параметры
-       /// </summary>
+        /// <summary>
+        /// показать основные параметры
+        /// </summary>
         public bool ShowMainParams { get; set; }
         /// <summary>
         /// начальная позиция основных параметров
@@ -336,7 +336,7 @@ namespace AlarmPP.Web.Services
         /// </summary>
         public int MainParamsWidth
         {
-            get { return LevelWidth + СombinationWidth + 2 * StrightWidth + GaugeWidth + 2*DrawdownWidth; }
+            get { return LevelWidth + СombinationWidth + 2 * StrightWidth + GaugeWidth + 2 * DrawdownWidth; }
         }
         /// <summary>
         /// дополнение к основным параметрам
@@ -352,16 +352,17 @@ namespace AlarmPP.Web.Services
         public bool Show3DegreeDigressions { get; set; }
         public bool ShowCloseToDangerous { get; set; }
         public bool ShowCloseTo2Degree { get; set; }
-        
+
         public bool FirstDegreeDigression { get; set; }
         public bool Show2DegreeDigressions { get; set; }
         public bool Show1DegreeDigressions { get; set; }
         public bool ShowOthersDigressions { get; set; }
         public bool ShowExcludedOnSwitch { get; set; }
         public bool ShowExcludedByOerator { get; set; }
-        public bool ShowNotTakenOnRating{ get; set; }
+        public bool ShowNotTakenOnRating { get; set; }
         public bool DigressionChecked { get; set; }
         public bool ShowGaps { get; set; }
+        public bool ShowGapsCloseToDangerous {get; set;}
         public bool ShowBolts { get; set; }
         public bool ShowFasteners { get; set; }
         public bool ShowPerShpals { get; set; }
@@ -486,7 +487,7 @@ namespace AlarmPP.Web.Services
                         }
                         if (km.IsPrinted)
                         {
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] { 2, 3, 4 });
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1, 2, 3, 4 });
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
@@ -556,6 +557,13 @@ namespace AlarmPP.Web.Services
                             //{
                             //    km.TrapezLevel += $"{km.LevelAvgTrapezoid[i] * km.StrightKoef:0.00},{km.Meters[i]} ";
                             //}
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1, 2, 3, 4 });
+                            km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
+                            km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
+                            km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
+                            km.Fasteners = AdditionalParametersRepository.Check_badfastening_state(Trip.Id, 999);
+                            km.DefShpals = AdditionalParametersRepository.Check_defshpal_state(Trip.Id, 999);
+                            km.PerShpals = AdditionalParametersRepository.Check_ViolPerpen(Trip.Id);
 
                             Kilometers.Add(km);
 
@@ -985,7 +993,7 @@ namespace AlarmPP.Web.Services
         DangerousDigression, DangerousForEmtyWagon, ThirdDegreeDigressions, CloseToDangerous, CloseTo2Degree,
         SecondDegreeDigression,FirstDegreeDigression, OthersDigressions, ExcludedOnSwitch, ExcludedByOerator,
       
-        NotTakenOnRating, Joints, RailProfile, Gaps, Bolts, Fasteners, PerShpals, DefShpals
+        NotTakenOnRating, Joints, RailProfile, Gaps, GapCloseToDangerous, Bolts, Fasteners, PerShpals, DefShpals
     }
     public enum Series { Pasport = 0, LevelZero = 1, LevelPasport = 2, LevelSignal = 3, 
         StrightRightZero = 4, StrightRightPasport = 5, StrightRightSignal = 6,
