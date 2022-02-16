@@ -118,16 +118,16 @@ namespace AlarmPP.Web.Pages
                     RdStructureRepository.SetButtonStatus(ShowButtons.Digression.ToString(), AppData.ShowDigressions);
                     break;
                 case ShowButtons.DangerousDigression:
-                    AppData.ShowGaps = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
-                    AppData.ShowGapsCloseToDangerous = false;
                     AppData.ShowDangerousDigressions = !AppData.ShowDangerousDigressions;
                     RdStructureRepository.SetButtonStatus(ShowButtons.DangerousDigression.ToString(), AppData.ShowDangerousDigressions);
-                    if (AppData.ShowDangerousDigressions)
+                    if (AppData.ShowDangerousDigressions) {
                         AppData.DigressionChecked = true;
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false; }
                     else
                         AppData.DigressionChecked = false;
                     break;
@@ -140,75 +140,87 @@ namespace AlarmPP.Web.Pages
                         AppData.DigressionChecked = false;
                     break;
                 case ShowButtons.ThirdDegreeDigressions:
-                    AppData.ShowGaps = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
-                    AppData.ShowGapsCloseToDangerous = false;
                     AppData.Show3DegreeDigressions = !AppData.Show3DegreeDigressions;
                     RdStructureRepository.SetButtonStatus(ShowButtons.ThirdDegreeDigressions.ToString(), AppData.Show3DegreeDigressions);
                     if (AppData.Show3DegreeDigressions)
+                    {
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                         AppData.DigressionChecked = true;
+                    }
+
                     else
                         AppData.DigressionChecked = false;
                     break;
                 case ShowButtons.CloseToDangerous:
-                    AppData.ShowGaps = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
-                    AppData.ShowGapsCloseToDangerous = false;
                     AppData.ShowCloseToDangerous = !AppData.ShowCloseToDangerous;
                     RdStructureRepository.SetButtonStatus(ShowButtons.CloseToDangerous.ToString(), AppData.ShowCloseToDangerous);
                     if (AppData.ShowCloseToDangerous)
+                    {
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                         AppData.DigressionChecked = true;
+                    }
                     else
                         AppData.DigressionChecked = false;
                     break;
                 case ShowButtons.GapCloseToDangerous:
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
+
                     AppData.ShowGapsCloseToDangerous = !AppData.ShowGapsCloseToDangerous;
                     RdStructureRepository.SetButtonStatus(ShowButtons.GapCloseToDangerous.ToString(), AppData.ShowGapsCloseToDangerous);
                     if (AppData.ShowGapsCloseToDangerous)
+                    {
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                         AppData.DigressionChecked = true;
+                    }
                     else
                         AppData.DigressionChecked = false;
                     break;
                 case ShowButtons.FirstDegreeDigression:
-                    AppData.ShowGaps = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
-                    AppData.ShowGapsCloseToDangerous = false;
-                    AppData.FirstDegreeDigression = !AppData.FirstDegreeDigression;
-                    RdStructureRepository.SetButtonStatus(ShowButtons.FirstDegreeDigression.ToString(), AppData.FirstDegreeDigression);
-                    if (AppData.Show2DegreeDigressions)
+                    AppData.Show1DegreeDigressions = !AppData.Show1DegreeDigressions;
+                    RdStructureRepository.SetButtonStatus(ShowButtons.FirstDegreeDigression.ToString(), AppData.Show1DegreeDigressions);
+                    if (AppData.Show1DegreeDigressions)
+                    {
                         AppData.DigressionChecked = true;
+                        AppData.ShowGaps = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                    }
                     else
                         AppData.DigressionChecked = false;
                     break;
                 case ShowButtons.SecondDegreeDigression:
-                    AppData.ShowGaps = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
-                    AppData.ShowGapsCloseToDangerous = false;
                     AppData.Show2DegreeDigressions = !AppData.Show2DegreeDigressions;
                     RdStructureRepository.SetButtonStatus(ShowButtons.SecondDegreeDigression.ToString(), AppData.Show2DegreeDigressions);
                     if (AppData.Show2DegreeDigressions)
+                    {
                         AppData.DigressionChecked = true;
+                        AppData.ShowGaps = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                    }
                     else
                         AppData.DigressionChecked = false;
                     break;
@@ -255,23 +267,19 @@ namespace AlarmPP.Web.Pages
                     break;
                 case ShowButtons.Gaps:
                     AppData.ShowGaps = !AppData.ShowGaps;
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
                     RdStructureRepository.SetButtonStatus(ShowButtons.Gaps.ToString(), AppData.ShowGaps);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Bolts.ToString(), AppData.ShowBolts);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Fasteners.ToString(), AppData.ShowFasteners);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.PerShpals.ToString(), AppData.ShowPerShpals);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
 
                     if (AppData.ShowGaps)
                     {
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                         AppData.DigressionChecked = true;
                     }
                     else
@@ -281,25 +289,21 @@ namespace AlarmPP.Web.Pages
                     break;
                 case ShowButtons.Bolts:
                     AppData.ShowBolts = !AppData.ShowBolts;
-                    AppData.ShowGapsCloseToDangerous = false;
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowGaps = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
                     RdStructureRepository.SetButtonStatus(ShowButtons.Bolts.ToString(), AppData.ShowBolts);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Gaps.ToString(), AppData.ShowGaps);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Fasteners.ToString(), AppData.ShowFasteners);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.PerShpals.ToString(), AppData.ShowPerShpals);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
 
                     if (AppData.ShowBolts)
                     {
                         AppData.DigressionChecked = true;
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                     }
                     else
                     {
@@ -308,25 +312,21 @@ namespace AlarmPP.Web.Pages
                     break;
                 case ShowButtons.Fasteners:
                     AppData.ShowFasteners = !AppData.ShowFasteners;
-                    AppData.ShowGapsCloseToDangerous = false;
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowGaps = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowPerShpals = false;
                     RdStructureRepository.SetButtonStatus(ShowButtons.Fasteners.ToString(), AppData.ShowFasteners);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Gaps.ToString(), AppData.ShowGaps);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Bolts.ToString(), AppData.ShowBolts);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.PerShpals.ToString(), AppData.ShowPerShpals);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
 
                     if (AppData.ShowFasteners)
                     {
                         AppData.DigressionChecked = true;
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowPerShpals = false;
                     }
                     else
                     {
@@ -335,25 +335,21 @@ namespace AlarmPP.Web.Pages
                     break;
                 case ShowButtons.PerShpals:
                     AppData.ShowPerShpals = !AppData.ShowPerShpals;
-                    AppData.ShowGapsCloseToDangerous = false;
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowDefShpals = false;
-                    AppData.ShowGaps = false;
-                    RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Gaps.ToString(), AppData.ShowGaps);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Bolts.ToString(), AppData.ShowBolts);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Fasteners.ToString(), AppData.ShowFasteners);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
+                    RdStructureRepository.SetButtonStatus(ShowButtons.PerShpals.ToString(), AppData.ShowPerShpals);
 
                     if (AppData.ShowPerShpals)
                     {
                         AppData.DigressionChecked = true;
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowDefShpals = false;
+                        AppData.ShowBolts = false;
                     }
                     else
                     {
@@ -362,25 +358,21 @@ namespace AlarmPP.Web.Pages
                     break;
                 case ShowButtons.DefShpals:
                     AppData.ShowDefShpals = !AppData.ShowDefShpals;
-                    AppData.ShowGapsCloseToDangerous = false;
-                    AppData.ShowCloseToDangerous = false;
-                    AppData.Show3DegreeDigressions = false;
-                    AppData.Show2DegreeDigressions = false;
-                    AppData.Show1DegreeDigressions = false;
-                    AppData.ShowDangerousDigressions = false;
-                    AppData.ShowBolts = false;
-                    AppData.ShowFasteners = false;
-                    AppData.ShowGaps = false;
-                    AppData.ShowPerShpals = false;
                     RdStructureRepository.SetButtonStatus(ShowButtons.DefShpals.ToString(), AppData.ShowDefShpals);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Gaps.ToString(), AppData.ShowGaps);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Bolts.ToString(), AppData.ShowBolts);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.Fasteners.ToString(), AppData.ShowFasteners);
-                    RdStructureRepository.SetButtonStatus(ShowButtons.PerShpals.ToString(), AppData.ShowPerShpals);
 
                     if (AppData.ShowDefShpals)
                     {
                         AppData.DigressionChecked = true;
+                        AppData.ShowDangerousDigressions = false;
+                        AppData.ShowCloseToDangerous = false;
+                        AppData.Show3DegreeDigressions = false;
+                        AppData.Show2DegreeDigressions = false;
+                        AppData.Show1DegreeDigressions = false;
+                        AppData.ShowGaps = false;
+                        AppData.ShowGapsCloseToDangerous = false;
+                        AppData.ShowFasteners = false;
+                        AppData.ShowBolts = false;
+                        AppData.ShowPerShpals = false;
                     }
                     else
                     {

@@ -95,16 +95,10 @@
             var closeToDangerGR = new List<string>() { DigressionName.gr.Name };
             foreach (var kilometer in Kilometers)
             {
-
-
                 if (kilometer.Digressions != null)
                 {
                     foreach (var digression in kilometer.Digressions)
                     {
-                        if (kilometer.Number == 727 && digression.Meter == 566)
-                        {
-
-                        }
                         int metre = kilometer.Direction == ALARm.Core.Direction.Direct ? digression.Meter + digression.Length / 2 : kilometer.Length - digression.Meter - digression.Length / 2;
                         int pos = currentKMPosition + metre;
                         int index = rowIndex;
@@ -170,7 +164,7 @@
                         {
                             if ((closeToDanger.Contains(digression.value.Otst) && AppData.ShowGapsCloseToDangerous) || AppData.ShowGaps){
                                 var color = "lightgray";
-                                @if (closeToDanger.Contains(digression.value.Otst) && AppData.ShowGapsCloseToDangerous)
+                                @if (closeToDanger.Contains(digression.value.Otst))
                                 {
                                     color = "red";
                                 }
