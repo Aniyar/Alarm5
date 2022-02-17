@@ -487,7 +487,7 @@ namespace AlarmPP.Web.Services
                         }
                         if (km.IsPrinted)
                         {
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1,2, 3, 4 });
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
@@ -557,7 +557,7 @@ namespace AlarmPP.Web.Services
                             //{
                             //    km.TrapezLevel += $"{km.LevelAvgTrapezoid[i] * km.StrightKoef:0.00},{km.Meters[i]} ";
                             //}
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1,2, 3, 4 });
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);

@@ -2383,7 +2383,7 @@ namespace ALARm.DataAccess
                 {
                     return db.QueryFirst<bool>(sqltext);
                 }
-                catch
+                catch(Exception e)
                 {
                     db.Execute("INSERT INTO public.pp_diagram_button_state(name, pressed) VALUES(@bname, false) ", new { bname = name }, commandType: CommandType.Text);
                 }
