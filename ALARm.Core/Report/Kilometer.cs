@@ -1455,6 +1455,7 @@ namespace ALARm.Core
                     //PasportLevel += $"{-1 * Math.Abs(yxu) * tempSign:0.00},{j} ";
 
                     PasportGauge += $"{(fsh0[j] - 1520) * GaugeKoef:0.00},{j} ";
+                    j++;
                     //PasportStraightLeft += $"{-1 * Math.Abs(yxr01) * tempSign * StrightKoef:0.00},{j} ";
 
                     /*if (j < meter.Count)
@@ -1470,6 +1471,7 @@ namespace ALARm.Core
                 catch (Exception e)
                 {
                     Console.WriteLine("Kilometer.GetZeroLines Error: " + e.Message);
+                    break;
                 }
             }
             for (int i = 0; i < fsh0.Count - 1; i++)
