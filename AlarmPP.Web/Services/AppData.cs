@@ -993,7 +993,9 @@ namespace AlarmPP.Web.Services
         DangerousDigression, DangerousForEmtyWagon, ThirdDegreeDigressions, CloseToDangerous, CloseTo2Degree,
         SecondDegreeDigression,FirstDegreeDigression, OthersDigressions, ExcludedOnSwitch, ExcludedByOerator,
       
-        NotTakenOnRating, Joints, RailProfile, Gaps, GapCloseToDangerous, Bolts, Fasteners, PerShpals, DefShpals
+        NotTakenOnRating, Joints,  Gaps, GapCloseToDangerous, Bolts, Fasteners, PerShpals, DefShpals,
+            //additional
+            RailProfile
     }
     public enum Series { Pasport = 0, LevelZero = 1, LevelPasport = 2, LevelSignal = 3, 
         StrightRightZero = 4, StrightRightPasport = 5, StrightRightSignal = 6,

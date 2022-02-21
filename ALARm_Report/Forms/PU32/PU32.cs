@@ -491,8 +491,12 @@ namespace ALARm_Report.Forms
 													(o.Degree == 4 || (o.FreightSpeedLimit > 0 && o.FreightSpeedLimit < o.FreightSpeedAllow) || (o.PassengerSpeedLimit > 0 && o.PassengerSpeedLimit < o.PassengerSpeedAllow)
 													)).ToList();
 
-					if (grk.Any()) Grk += grk.Count;
+					//if (grk.Any()) Grk += grk.Count;
 
+					if (grk.Any())
+					{
+						Grk = grk.Count;
+					}
 					var kriv = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") 
 					&& (  o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси") && !o.Comment.Contains("-/-") &&  !o.Comment.Contains("") && !o.FreightSpeedLimit.Equals("-") && !o.PassengerSpeedLimit.Equals("-"))).ToList();
 					if (kriv.Count > 0)
@@ -512,11 +516,10 @@ namespace ALARm_Report.Forms
 														  o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п")).ToList();
 					if (iznos.Any()) Iznos += iznos.Count;
 
-					var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") &&( o.DigName.Equals("З?") || o.DigName.Equals("З") || 
-					o.DigName.Equals("З п.") || o.DigName.Equals("З л."))).ToList();
+					var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.")  && !o.DigName.Equals("ПрУ") &&( o.DigName.Equals("З?") )  && km.Number== km.Digressions.Select( x => x.Km).ToList().First()).ToList();
 					if (zazor.Any()) Zazor += zazor.Count;
 
-
+					
 
 
 					//Pu32_gap.Count() + (gapV.Count()
@@ -524,7 +527,31 @@ namespace ALARm_Report.Forms
 					Total comparativeKMTotal = null;
 
 					kmTotal.IsKM = true;
-
+					if (grk.Any())
+					{ 
+						kmTotal.Grk = grk.Count;
+					}
+					if (kriv.Any())
+					{
+						kmTotal.Kriv = kriv.Count;
+					}
+					if (pru.Any())
+					{
+						kmTotal.Pru = pru.Count;
+					}
+					if (oshk.Any())
+					{
+						kmTotal.Oshk = oshk.Count;
+					}
+					if (iznos.Any())
+					{
+						kmTotal.Iznos = iznos.Count;
+					}
+					if (zazor.Any())
+					{
+						km.Number = km.Number;
+						kmTotal.Zazor = zazor.Count;
+					}
 
 
 
@@ -540,12 +567,19 @@ namespace ALARm_Report.Forms
 					if (isgap.Any())
 					{
 						if (isgap.Where(o => o.Otst == "З").ToList().Count > 0)
+						{
 							kmTotal.AddParamPointSum += 50;
+							kmTotal.Additional += isgap.Where(x => x.Otst == "З").Count();
+
+						}
+
 						else if (isgap.Where(o => o.Otst == "З?").ToList().Count > 0)
+						{
 							kmTotal.AddParamPointSum += 20;
 
-						Zazor++;
-						kmTotal.Additional += isgap.Count;
+						}
+
+						Zazor += isgap.Count;
 					}
 
 
@@ -714,7 +748,7 @@ namespace ALARm_Report.Forms
 									digression.Digression = DigressionName.Strightening;
 									kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
 									break;
-								case string digname when digname.Equals("Рнр"):
+								case string digname when (digname.Equals("Рнр") && digression.Degree ==4):
 									digression.Digression = DigressionName.Strightening;
 									kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
 									break;
@@ -744,7 +778,7 @@ namespace ALARm_Report.Forms
 								kmTotal.Fourth++;
 							}
 						//if (digression.Digtype != DigressionType.Main && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт."))
-								if (digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.") && digression.DigName.Contains("Изн"))
+								if (digression.DigName.Contains("З") && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.") && digression.DigName.Contains("Изн"))
 
 								{
 									kmTotal.Additional++;
@@ -940,7 +974,7 @@ namespace ALARm_Report.Forms
 										digression.Digression = DigressionName.Strightening;
 										comparativeKMTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
 										break;
-									case string digname when digname.Equals("Рнр"):
+									case string digname when digname.Equals("Рнр") && digression.Degree == 4:
 										digression.Digression = DigressionName.Strightening;
 										comparativeKMTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
 										break;
@@ -1032,51 +1066,77 @@ namespace ALARm_Report.Forms
 					pdbElement.Add(kmElement);
 
 				}
-				for (int i = 0; i < kilometers[0].Track_name.Count(); i++)
-				{
-					sectionElement.Add(
-						new XAttribute("Grk", Grk),
-						new XAttribute("KRIV", Kriv),
-						new XAttribute("PRU", Pru),
-						new XAttribute("OSHK", Oshk),
-						new XAttribute("IZNOS", Iznos),
-						new XAttribute("ZAZOR", Pu32_gap_count), //
-																 //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
-						new XAttribute("NEROVNOSTY", NerProf)
-						);
-				}
+				//for (int i = 0; i < kilometers[0].Track_name.Count(); i++)
+				//{
+				//	sectionElement.Add(
+				//		new XAttribute("Grk", Grk),
+				//		new XAttribute("KRIV", Kriv),
+				//		new XAttribute("PRU", Pru),
+				//		new XAttribute("OSHK", Oshk),
+				//		new XAttribute("IZNOS", Iznos),
+				//		new XAttribute("ZAZOR", Pu32_gap_count), //
+				//												 //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+				//		new XAttribute("NEROVNOSTY", NerProf)
+				//		);
+				//}
+
+
+
+				//if (kilometers[0].Track_name.Count() <2)
+				//{
+				//	sectionElement.Add(
+				//		new XAttribute("Grk", Grk),
+				//		new XAttribute("KRIV", Kriv),
+				//		new XAttribute("PRU", Pru),
+				//		new XAttribute("OSHK", Oshk),
+				//		new XAttribute("IZNOS", Iznos),
+				//		new XAttribute("ZAZOR", Pu32_gap_count), //
+				//												 //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+				//		new XAttribute("NEROVNOSTY", NerProf)
+				//		);
+				//}
+				//sectionElement.Add(
+    //                new XAttribute("Grk", Grk),
+    //                new XAttribute("KRIV", Kriv),
+    //                new XAttribute("PRU", Pru),
+    //                new XAttribute("OSHK", Oshk),
+    //                new XAttribute("IZNOS", Iznos),
+    //                new XAttribute("ZAZOR", Pu32_gap_count), //
+    //                                                         //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+    //                new XAttribute("NEROVNOSTY", NerProf)
+    //                );
+
+
+                int sumGrk = 0, sumKriv = 0, sumPru = 0, sumOshk = 0, sumIznos = 0, sumPu32_gap_count = 0, sumKNerProf = 0, sumZazor = 0;
 
 			
-
-				
-				int sumGrk = 0, sumKriv = 0, sumPru = 0, sumOshk = 0, sumIznos = 0, sumPu32_gap_count = 0, sumKNerProf = 0;
-
-				if (kilometers[0].Track_name.Count() < 2)
-				{
-					byKilometer.Add(
-						new XAttribute("Grk", Grk),
-						new XAttribute("KRIV", Kriv),
-						new XAttribute("PRU", Pru),
-						new XAttribute("OSHK", Oshk),
-						new XAttribute("IZNOS", Iznos),
-						new XAttribute("ZAZOR", Pu32_gap_count), //
-																 //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
-						new XAttribute("NEROVNOSTY", NerProf)
-						);
-				}
-				else
-				{
-					byKilometer.Add(
-					new XAttribute("Grk", sumGrk),
-					new XAttribute("KRIV", sumKriv),
-					new XAttribute("PRU", sumPru),
-					new XAttribute("OSHK", sumOshk),
-					new XAttribute("IZNOS", sumIznos),
-					new XAttribute("ZAZOR", sumPu32_gap_count), //
-																//new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
-					new XAttribute("NEROVNOSTY", sumKNerProf)
-					);
-				}
+				//{
+				//	byKilometer.Add(
+				//		new XAttribute("Grk", Grk),
+				//		new XAttribute("KRIV", Kriv),
+				//		new XAttribute("PRU", Pru),
+				//		new XAttribute("OSHK", Oshk),
+				//		new XAttribute("IZNOS", Iznos),
+				//		new XAttribute("ZAZOR", Zazor),
+				//		new XAttribute("SOCHET", Sochet),//
+				//								               //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+				//		new XAttribute("NEROVNOSTY", NerProf)
+				//		);
+				//}
+				//if (kilometers[0].Track_name.Count() < 2)
+				//{
+				//	byKilometer.Add(
+				//	new XAttribute("Grk", sumGrk),
+				//	new XAttribute("KRIV", sumKriv),
+				//	new XAttribute("PRU", sumPru),
+				//	new XAttribute("OSHK", sumOshk),
+				//	new XAttribute("IZNOS", sumIznos),
+				//    new XAttribute("SOCHET", Sochet),
+				//	new XAttribute("ZAZOR", sumZazor), //
+				//												//new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+				//	new XAttribute("NEROVNOSTY", sumKNerProf)
+				//	);
+				//}
 
 
 				PDBTotalGenerate(ref pdbElement, ref pdbTotal, ref pdElement, ref pdTotal, "", "", ref compPdbTotal, ref compPdTotal);
@@ -1107,6 +1167,18 @@ namespace ALARm_Report.Forms
 					new XAttribute("bad", distanceTotal.RatingCounts[3].ToString("0.000", nfi)),
 					new XAttribute("limit", distanceTotal.IsLimited),
 					new XAttribute("d4", distanceTotal.Fourth),
+				 //
+					new XAttribute("SOCHET", "0"),//to doo 
+					new XAttribute("Grk", distanceTotal.Grk),
+					new XAttribute("KRIV", distanceTotal.Kriv),
+					new XAttribute("PRU", distanceTotal.Pru),
+					new XAttribute("OSHK", distanceTotal.Oshk),
+					new XAttribute("IZNOS", distanceTotal.Iznos),
+					new XAttribute("ZAZOR", distanceTotal.Zazor), //
+					new XAttribute("NEROVNOSTY", distanceTotal.NerProf),
+					//
+					
+
 					new XAttribute("other", (distanceTotal.Combination + distanceTotal.Curves + distanceTotal.Other)),
 					new XAttribute("add", distanceTotal.Additional),
 					new XAttribute("repair", distanceTotal.Repairing),
@@ -1292,6 +1364,15 @@ namespace ALARm_Report.Forms
 					new XAttribute("limit", sectionTotal.IsLimited),
 					//
 					new XAttribute("d4", sectionTotal.Fourth),
+
+				    new XAttribute("SOCHET", "0"),//to doo 
+					new XAttribute("Grk", sectionTotal.Grk),
+					new XAttribute("KRIV", sectionTotal.Kriv),
+				    new XAttribute("PRU", sectionTotal.Pru),
+					new XAttribute("OSHK", sectionTotal.Oshk),
+					new XAttribute("IZNOS", sectionTotal.Iznos),
+					new XAttribute("ZAZOR", sectionTotal.Zazor), //
+					new XAttribute("NEROVNOSTY", sectionTotal.NerProf),
 					//
 					new XAttribute("other", (sectionTotal.Combination + sectionTotal.Curves + sectionTotal.Other)),
 					new XAttribute("add", sectionTotal.Additional),
@@ -1566,6 +1647,27 @@ namespace ALARm_Report.Forms
 		public int MainParamPointSum { get; set; }
 		public int AddParamPointSum { get; set; }
 		public int CurvePointSum { get; set; }
+
+
+
+
+
+
+	
+		//GRK KRIV...
+		public int Grk { get; set; }
+		public int Kriv { get; set; }
+		public int Pru { get; set; }
+		public int Oshk { get; set; }
+		public int Iznos { get; set; }
+		public int Sochet { get; set; }
+		public int Zazor { get; set; }
+		public int Pu32_gap_count { get; set; }
+		public int NerProf { get; set; }
+		//TO DOO SOC
+
+		//
+
 		//ToDo Tolegen
 		public int Additional { get; set; }
 
@@ -1593,8 +1695,18 @@ namespace ALARm_Report.Forms
 				}
 
 			}
+			
 			return new Total
 			{
+				Grk = t1.Grk + t2.Grk,
+				Sochet = t1.Sochet + t2.Sochet,
+				Pru = t1.Pru + t2.Pru,
+				Kriv = t1.Kriv + t2.Kriv,
+				Oshk = t1.Oshk + t2.Oshk,
+				Iznos = t1.Iznos + t2.Iznos,
+				NerProf = t1.NerProf + t2.NerProf,
+				Zazor = t1.Zazor + t2.Zazor,
+
 				DirectionCode = t1.DirectionCode,
 				Code = t1.Code,
 				IsLimited = t1.IsLimited + t2.IsLimited,

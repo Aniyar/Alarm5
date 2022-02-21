@@ -6,6 +6,7 @@
     <PackageIcon></PackageIcon>
     <PackageIconUrl />
     <Version>1.0.1</Version>
+    <UserSecretsId>1f5d334f-247d-4fcc-8986-4a1a2ddbb2ba</UserSecretsId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <PlatformTarget>AnyCPU</PlatformTarget>

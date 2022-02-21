@@ -6398,7 +6398,8 @@ begin
         end;
                  comment:='';
         xxxx := (L0v div 100) + 1;
-               if (L0v> Lmv )   then     WRih[ns].onswitch := ProberkaNaStrelku(L0v, L0v + Ln, 1);
+               if (Lmv> L0v )   then     WRih[ns].onswitch := ProberkaNaStrelku(L0v, L0v + Ln, 1);
+                      if (Lmv> L0v )   then     WRih[ns].onswitch := ProberkaNaStrelku(L0v, L0v + Ln, 1);
            if (not( ProberkaNaStrelku(L0v, L0v + Ln, 1)) and  not(isriht) )then
             comment:='V=' + V_shekti(v1, v2)+'ïê'+inttostr(xxxx)+' Ðíð '+inttostr(belv) +'/'+ inttostr(2*Ln)+ '; ' ;
 
@@ -6896,6 +6897,7 @@ begin
            comment_gr:= '';
            v1:=500;
            v2:=60;
+                      xxxx := L0v div 100 + 1;
           WRT_UBEDOM(L0v, Lmv, stv, 'V=' + V_shekti(v1, v2)+ 'ïê' +
           inttostr(xxxx) + 'Ï'+ots  +'ãð' +'; ', v1, v2);
                     comment_gr:='ãð';

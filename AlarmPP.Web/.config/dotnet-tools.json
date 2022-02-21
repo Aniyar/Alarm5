@@ -7,6 +7,12 @@
       "commands": [
         "electronize"
       ]
+    },
+    "dotnet-ef": {
+      "version": "6.0.2",
+      "commands": [
+        "dotnet-ef"
+      ]
     }
   }
 }
