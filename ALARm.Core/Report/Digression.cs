@@ -141,6 +141,10 @@ namespace ALARm.Core.Report
         public int PassSpeed { get; set; }
         public int FreightSpeed { get; set; }
         public int Zazor { get; set; }
+        public int Zazor_L { get; set; }
+        public int Zazor_R { get; set; }
+       
+           
         public DigressionType DigressionType { get; set; } = DigressionType.Additional;
         public string Pdb_section { get; set; }
         public string Fragment { get; set; }
@@ -179,12 +183,16 @@ namespace ALARm.Core.Report
         {
             FullSpeed = PassSpeed + "/" + FreightSpeed;
             Zazor = (int)(Zazor * Helper.GetGapKoef());
+      
 
             if (61 <= PassSpeed && PassSpeed <= 100)
             {
+                
                 switch (Zazor)
                 {
-                    case var value when 25 <= value && value <= 30:
+
+                    case var value when 25 <= value && value <= 30 :
+                        Kmetr = Kmetr;
                         AllowSpeed = "";
                         DigName = DigressionName.GapSimbol;
                         break;
@@ -384,8 +392,8 @@ namespace ALARm.Core.Report
                     count += Length % 4 > 0 ? 1 : 0;
                     break;
                 case string digname when digname == DigressionName.Level.Name: //ур
-                    count = Length / 10;
-                    count += Length % 10 > 0 ? 1 : 0;
+                    count = Length / 20;
+                    count += Length % 20 > 0 ? 1 : 0;
                     break;
                 case string digname when 
                 digname == DigressionName.TreadTiltLeft.Name || digname == DigressionName.TreadTiltRight.Name ||

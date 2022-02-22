@@ -1098,9 +1098,14 @@ namespace ALARm.DataAccess
                     var gap_l = gaps.Where(o => o.Threat == Threat.Left).ToList();
                     var gap_r = gaps.Where(o => o.Threat == Threat.Right).ToList();
                    
-
+                    
                     foreach (var gap in gap_l)
                     {
+
+                        if(gap.Km == 700)
+                        {
+                            
+                        }
                         var zabeg = "-999";
                         var Vdop = "";
                         var Ots = "";
@@ -1113,12 +1118,20 @@ namespace ALARm.DataAccess
                                 double k = (double)gap.H / (double)r.First().H;
                                 gap.Zazor = (int)(r.First().Zazor * k);
                                 gap.GetDigressions436();
+                                if (gap.DigName.Name.Equals("З?"))
+                                    gap.DigName.Name = "З?Л";
+                                if (gap.DigName.Name.Equals("З"))
+                                    gap.DigName.Name = "ЗЛ";
                             }
                             if (r.First().Zazor == -1)
                             {
                                 double k = (double)r.First().H / (double)gap.H;
                                 r.First().Zazor = (int)(gap.Zazor * k);
                                 r.First().GetDigressions436();
+                                if (gap.DigName.Name.Equals("З?"))
+                                    gap.DigName.Name = "З?Л";
+                                if (gap.DigName.Name.Equals("З"))
+                                    gap.DigName.Name = "ЗЛ";
                             }
 
                             zabeg = (gap.Koord - r.First().Koord).ToString();

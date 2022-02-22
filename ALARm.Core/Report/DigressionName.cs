@@ -60,6 +60,10 @@
         public static DigName FusingGap = new DigName() { Name = "СЗ", Value = 109 };
         public static DigName Gap = new DigName() { Name = "З", Value = 110 };
         public static DigName GapSimbol = new DigName() { Name = "З?", Value = 1100 };
+
+        public static DigName GapSimbol_left = new DigName() { Name = "З?Л", Value = 1100 };
+
+        public static DigName GapSimbol_right = new DigName() { Name = "З?П", Value = 1100 };
         public static DigName AnomalisticGap = new DigName() { Name = "АРЗ", Value = 111 };
         public static DigName None = new DigName() { Name = "Отсут.", Value = 112 };
 

@@ -129,73 +129,73 @@ namespace GapService
                         Console.WriteLine("Ñòûê ERROR! " + e.Message);
                     }
 
-                    try
-                    {
-                        GetBolt(trip, km, DistId); //ñòûêè
-                        Console.WriteLine("Áîëò ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Áîëò ERROR! " + e.Message);
-                    }
-                    try
-                    {
-                        GetBalast(trip, km, DistId); //áàëàñò
-                        Console.WriteLine("Áàëàñò ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Áàëàñò ERROR! " + e.Message);
-                    }
+                    //try
+                    //{
+                    //    GetBolt(trip, km, DistId); //ñòûêè
+                    //    Console.WriteLine("Áîëò ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Áîëò ERROR! " + e.Message);
+                    //}
+                    //try
+                    //{
+                    //    GetBalast(trip, km, DistId); //áàëàñò
+                    //    Console.WriteLine("Áàëàñò ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Áàëàñò ERROR! " + e.Message);
+                    //}
 
-                    try
-                    {
-                        GetPerpen(trip, km, DistId);
-                        Console.WriteLine("Perpen ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Perpen ERROR! " + e.Message);
-                    }
+                    //try
+                    //{
+                    //    GetPerpen(trip, km, DistId);
+                    //    Console.WriteLine("Perpen ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Perpen ERROR! " + e.Message);
+                    //}
 
-                    try
-                    {
-                        GetSleepers(trip, km, DistId);
-                        Console.WriteLine("Øïàëû ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Øïàëû ERROR! " + e.Message);
-                    }
+                    //try
+                    //{
+                    //    GetSleepers(trip, km, DistId);
+                    //    Console.WriteLine("Øïàëû ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Øïàëû ERROR! " + e.Message);
+                    //}
 
-                    try
-                    {
-                        GetdeviationsinSleepers(trip, km, DistId); //Îãğ øïàëû
-                        Console.WriteLine("Îãğ øïàëû ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Îãğ øïàëû ERROR! " + e.Message);
-                    }
+                    //try
+                    //{
+                    //    GetdeviationsinSleepers(trip, km, DistId); //Îãğ øïàëû
+                    //    Console.WriteLine("Îãğ øïàëû ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Îãğ øïàëû ERROR! " + e.Message);
+                    //}
 
-                    try
-                    {
-                        Getbadfasteners(trip, km, DistId); //Ñêğåïëåíèå
-                        Console.WriteLine("Ñêğåïëåíèå ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Ñêğåïëåíèå ERROR! " + e.Message);
-                    }
-                    try
-                    {
-                        Getdeviationsinfastening(trip, km, DistId); //îãğ â ñêğåï
-                        Console.WriteLine("Îãğ ñêîğ Ñêğåïëåíèå ÎÊ!");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Îãğ ñêîğ Ñêğåïëåíèå ERROR! " + e.Message);
-                    }
+                    //try
+                    //{
+                    //    Getbadfasteners(trip, km, DistId); //Ñêğåïëåíèå
+                    //    Console.WriteLine("Ñêğåïëåíèå ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Ñêğåïëåíèå ERROR! " + e.Message);
+                    //}
+                    //try
+                    //{
+                    //    Getdeviationsinfastening(trip, km, DistId); //îãğ â ñêğåï
+                    //    Console.WriteLine("Îãğ ñêîğ Ñêğåïëåíèå ÎÊ!");
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //    Console.WriteLine("Îãğ ñêîğ Ñêğåïëåíèå ERROR! " + e.Message);
+                    //}
                 };
                 _channel.BasicConsume(queue: QueueName,
                                       autoAck: true,
@@ -335,9 +335,56 @@ namespace GapService
                     gap.FreightSpeed = fr_speed;
 
                     if (gap.Zazor != -1 || gap.Zazor != 1)
+
                         gap.Zazor = (int)(gap.Zazor * 0.8);
 
+                    //gap.Zazor = (int)(gap.Zazor );
+
                     gap.GetDigressions436();
+                    //var gap_l = gaps.Where(o => o.Threat == Threat.Left).ToList();
+                    //var gap_r = gaps.Where(o => o.Threat == Threat.Right).ToList();
+
+                    //var r = gap_r.Where(o => o.Km == gap.Km && (o.Meter >= gap.Meter - 1 && o.Meter <= gap.Meter + 1)).ToList();
+                    //if (gap_l.Any())
+                    //{
+                    //    //if (gap.Zazor == -1)
+                    //    //{
+                    //        double k = (double)gap.H / (double)r.First().H;
+                    //        gap.Zazor = (int)(r.First().Zazor * k);
+                    //        gap.GetDigressions436();
+                    //        if (gap.DigName.Name.Equals("Ç?"))
+                    //            gap.DigName.Name = "Ç?Ë";
+                    //        if (gap.DigName.Name.Equals("Ç"))
+                    //            gap.DigName.Name = "ÇË";
+                    //   // }
+                    //    //if (r.First().Zazor == -1)
+                    //    //{
+                    //    //    double k = (double)r.First().H / (double)gap.H;
+                    //    //    r.First().Zazor = (int)(gap.Zazor * k);
+                    //    //    r.First().GetDigressions436();
+                    //    //    if (gap.DigName.Equals("Ç?"))
+                    //    //        gap.DigName.Name = "Ç?Ï";
+                    //    //    if (gap.DigName.Equals("Ç"))
+                    //    //        gap.DigName.Name = "ÇÏ";
+                    //    //}
+
+                    //}
+
+                    //if (gap_r.Any())
+                    //{
+
+
+                    //    double k = (double)r.First().H / (double)gap.H;
+                    //    r.First().Zazor = (int)(gap.Zazor * k);
+                    //    r.First().GetDigressions436();
+                    //    if (gap.DigName.Name.Equals("Ç?"))
+                    //        gap.DigName.Name = "Ç?Ë";
+                    //    if (gap.DigName.Name.Equals("Ç"))
+                    //        gap.DigName.Name = "ÇË";
+
+
+                    //}
+
                 }
 
                 AdditionalParametersService.Insert_gap(mainProcess.Trip_id, -1, gaps);

@@ -6213,10 +6213,11 @@ begin
 
              StartStr:=  round((L0v+Lmv)/2-Ln) ;
              FinshStr   :=  round((L0v+Lmv)/2+Ln) ;
+                  WRih[ns].onswitch := ProberkaNaStrelku(StartStr,  FinshStr  , 1);
                        isriht:= isriht;
-        if   ((ProberkaNaStrelku(L0v , Lmv , 1) or ProberkaNaStrelku(Lmv , L0v , 1)) and (FlagkrivPlus or FlagkrivMinus )   ) then
+        if   (( ProberkaNaStrelku(StartStr,  FinshStr  , 1)) and (FlagkrivPlus or FlagkrivMinus )   ) then
                isriht:=false;
-                    WRih[ns].onswitch := ProberkaNaStrelku(StartStr,  FinshStr  , 1);
+
 
 
                       WRih[ns].isriht := isriht;
@@ -6398,7 +6399,9 @@ begin
         end;
                  comment:='';
         xxxx := (L0v div 100) + 1;
-               if (L0v> Lmv )   then     WRih[ns].onswitch := ProberkaNaStrelku(L0v, L0v + Ln, 1);
+
+            WRih[ns].onswitch := ProberkaNaStrelku(StartStr,  FinshStr  , 1);
+
            if (not( ProberkaNaStrelku(L0v, L0v + Ln, 1)) and  not(isriht) )then
             comment:='V=' + V_shekti(v1, v2)+'ïê'+inttostr(xxxx)+' Ðíð '+inttostr(belv) +'/'+ inttostr(2*Ln)+ '; ' ;
 
@@ -6896,6 +6899,7 @@ begin
            comment_gr:= '';
            v1:=500;
            v2:=60;
+                      xxxx := L0v div 100 + 1;
           WRT_UBEDOM(L0v, Lmv, stv, 'V=' + V_shekti(v1, v2)+ 'ïê' +
           inttostr(xxxx) + 'Ï'+ots  +'ãð' +'; ', v1, v2);
                     comment_gr:='ãð';

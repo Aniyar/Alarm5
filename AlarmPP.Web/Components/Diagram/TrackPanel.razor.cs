@@ -189,6 +189,9 @@ namespace AlarmPP.Web.Components.Diagram
                                                 //RdStructureRepository.SendEkasuiData(AppData.Trip, AppData.Kilometers[prevIndex].Number);
 
                                                 AppData.Kilometers[prevIndex].Digressions = RdStructureRepository.GetDigressionMarks(AppData.Trip.Id, AppData.Kilometers[prevIndex].Number, AppData.Kilometers[prevIndex].Track_id, new int[] { 3, 4 });
+                                              
+
+
                                                 if (AppData.Kilometers[prevIndex].Digressions != null)
                                                 {
                                                     var dangerouses = AppData.Kilometers[prevIndex].Digressions.Where(digression => digression.Degree == 4).ToList();
@@ -511,8 +514,10 @@ namespace AlarmPP.Web.Components.Diagram
                         //    RdStructureRepository.SendEkasuiData(AppData.Trip, AppData.Kilometers[prevIndex].Number);
                         //    AppData.EmailCount++;
                         //}
-
+                        //List<CrosProf> GetCrossRailProfileFromDBbyKm(int kilometer, long trip_id);
                         AppData.Kilometers[prevIndex].Digressions = RdStructureRepository.GetDigressionMarks(AppData.Trip.Id, AppData.Kilometers[prevIndex].Number, AppData.Kilometers[prevIndex].Track_id, new int[] { 3, 4 });
+                        //AppData.Kilometers[prevIndex].AdditionalDigressions = AdditionalParametersRepository.GetCrossRailProfileFromDBbyKm(AppData.Kilometers[prevIndex].Number, AppData.Trip.Id);
+                        //AppData.Kilometers[prevIndex].Digressions.Add( AdditionalParametersRepository.GetCrossRailProfileFromDBbyKm(AppData.Kilometers[prevIndex].Number, AppData.Trip.Id));
                         var dangerouses = AppData.Kilometers[prevIndex].Digressions.Where(digression => digression.Degree == 4).ToList();
                         StringBuilder dangers = new StringBuilder();
                         foreach (var dangerous in dangerouses)

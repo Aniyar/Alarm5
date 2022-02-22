@@ -525,7 +525,8 @@ namespace ALARm.Core
         public int CorrectionMeter { get; set; } = -1;
         public CorrectionType CorrectionType { get; set; } = CorrectionType.None;
         public List<DigressionMark> Digressions { get; set; } = new List<DigressionMark>();
-
+        public List<CrosProf> AdditionalDigressions { get; set; } = new List<CrosProf>();
+        //List<> GetCrossRailProfileFromDBbyKm(int kilometer, long trip_id);
         public List<CorrectionNote> CorrectionNotes = new List<CorrectionNote>();
         public List<Gap> Gaps { get; set; } = new List<Gap>();
         public List<Digression> Bolts { get; set; } = new List<Digression>();
@@ -1001,7 +1002,11 @@ namespace ALARm.Core
             {
                 foreach (var curve in Curves)
                 {
-                    if (curve.Start_Km == Number)
+                    if ( curve.Start_Km== 705)
+                    {
+                        var x = curve.Start_Km;
+                    }
+                    if (curve.Start_Km == Number && curve.Final_Km == Number)
                         Digressions.Add(new DigressionMark() { Meter = curve.Start_M, Alert = $"{curve.Start_M} R:{curve.Straightenings[0].Radius} h:{curve.Elevations[0].Lvl} Ш:{curve.Straightenings[0].Width} И:{curve.Straightenings[0].Wear}" });
                 }
 

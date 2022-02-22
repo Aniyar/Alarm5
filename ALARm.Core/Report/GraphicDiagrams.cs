@@ -980,6 +980,12 @@ namespace ALARm.Core.Report
                         //    note.Value = (float)(note.Value / 100.0);
                         //}
 
+                        var primech2 = note.Comment.Any() ? note.Comment : "";
+                        var primech3 = GetMarkByNoteType("Анп");
+                        if (note.Km == 706 && note.Meter > 170 && note.Meter < 200)
+                        {
+                            primech3 = GetMarkByNoteType("Анп");
+                        }
                         digElements.Add(new XElement("m",
                                             new XAttribute("top", -(meter + 10)),
                                             new XAttribute("x", 1),
@@ -993,9 +999,19 @@ namespace ALARm.Core.Report
                                             new XAttribute("note", note.DigName),
                                                     new XAttribute("Meter", note.Meter),
                                             new XAttribute("fw", note.FontStyle())));
+                        digElements.Add(new XElement("otst",
+                                          new XAttribute("top", -(meter + 10)),
+                                          new XAttribute("x", 220),
+                                          new XAttribute("note", primech3),
+                                                  new XAttribute("Meter", note.Meter),
+                                          new XAttribute("fw", note.FontStyle())));
 
-
-
+                        digElements.Add(new XElement("otst",
+                                         new XAttribute("top", -(meter + 10)),
+                                         new XAttribute("x", 60),
+                                         new XAttribute("note", primech2),
+                                                 new XAttribute("Meter", note.Meter),
+                                         new XAttribute("fw", note.FontStyle())));
 
                         digElements.Add(new XElement("len",
                                             new XAttribute("top", -(meter + 10)),
@@ -1011,38 +1027,6 @@ namespace ALARm.Core.Report
                                             new XAttribute("note", DigressionName.SpeedUpNear == note.Digression ? "" : note.LimitSpeedToString()),
                                                     new XAttribute("Meter", note.Meter),
                                             new XAttribute("fw", note.FontStyle())));
-
-                        //digElements.Add(new XElement("mark",
-                        //                    new XAttribute("top", -note.Meter),
-                        //                    new XAttribute("x", 185),
-                        //                    new XAttribute("note", GetMarkByNoteType(note.DigName)),
-                        //                            new XAttribute("Meter", note.Meter),
-                        //                    new XAttribute("fw", note.FontStyle())));
-
-                        if (note.DigName.Contains("Анп") || note.DigName.Contains("?Анп"))
-                        {
-                            var primech = note.Comment.Any() ? note.Comment : "";
-
-                            addParam.Add(new XElement("AnpNote",
-                               new XAttribute("y1", -(meter)),
-                               new XAttribute("note", note.Comment.Any() ? note.Comment : ""),
-                                                    new XAttribute("Meter", note.Meter),
-                               new XAttribute("fw", "normal")));
-
-                            usedTops.Add(meter.RoundTo10() + 10);
-                            usedTops.Add(meter.RoundTo10());
-                        }
-                        else
-                        {
-                            digElements.Add(new XElement("otkl",
-                                            new XAttribute("top", -meter),
-                                            new XAttribute("x", note.DigName.Contains("Пси") ? 80 : 63),
-                                            new XAttribute("note", note.Value),
-                                                    new XAttribute("Meter", note.Meter),
-                                            new XAttribute("fw", note.FontStyle())));
-
-                            usedTops.Add(meter);
-                        }
 
 
 

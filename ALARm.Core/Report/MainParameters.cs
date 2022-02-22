@@ -694,12 +694,21 @@ namespace ALARm.Core.Report
 
                         var Dname = "";
 
-                        if (AnpPassMax > 0.70)
+                        //if (AnpPassMax > 0.70)
+                        //{
+                        //    Dname = DigressionName.SpeedUp.Name;
+                        //    Ogr = RoundNumToFive(Ogr);
+                        //}
+                        //else if (0.65 <= AnpPassMax && AnpPassMax <= 0.70)
+
+                        if (AnpPassMax > 0.70 && kilometer.Number == pkm)
                         {
                             Dname = DigressionName.SpeedUp.Name;
                             Ogr = RoundNumToFive(Ogr);
                         }
-                        else if (0.65 <= AnpPassMax && AnpPassMax <= 0.70)
+                        else if (0.65 <= AnpPassMax && AnpPassMax <= 0.70 && kilometer.Number == pkm)
+
+
                         {
                             Dname = DigressionName.SpeedUpNear.Name;
                             Ogr = -1;
