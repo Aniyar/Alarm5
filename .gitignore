@@ -38,10 +38,6 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 .svn/
-ALARmProcees/ALARmProcess.identcache
-ALARmProcees/__recovery/DataModule.dfm
-ALARmProcees/__recovery/DataModule.pas
-ALARmProcees/__recovery/__recovery.ini
 
 ALARmProcees/ALARmProcess.identcache
 # Uncomment if you have tasks that create the project's static files in wwwroot
