@@ -1552,6 +1552,25 @@ namespace ALARm_Report.Forms
 					pdbElement.Add(kmElement);
 
 
+				}
+				for (int i = 0; i < kilometers[0].Track_name.Count(); i++)
+				{
+					sectionElement.Add(
+						new XAttribute("Grk", Grk),
+						new XAttribute("KRIV", Kriv),
+						new XAttribute("PRU", Pru),
+						new XAttribute("OSHK", Oshk),
+						new XAttribute("IZNOS", Iznos),
+						new XAttribute("ZAZOR", Pu32_gap_count), //
+																 //new XAttribute("ZAZOR", Pu32_gap_count + gapV_count), //TodoPu32_gap_count
+						new XAttribute("NEROVNOSTY", NerProf)
+						);
+				}
+
+			
+
+				
+				int sumGrk = 0, sumKriv = 0, sumPru = 0, sumOshk = 0, sumIznos = 0, sumPu32_gap_count = 0, sumKNerProf = 0;
 
 				}
 
