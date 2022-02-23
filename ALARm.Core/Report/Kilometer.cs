@@ -997,6 +997,17 @@ namespace ALARm.Core
                 }
 
                 Digressions.AddRange(rdStructureRepository.GetDigressionMarks(trip.Id, Track_id, Number));
+                //данные Износа рельса Бок.из.
+                //var DBcrossRailProfile = AdditionalParam.ge(Number, Trip.Id);
+                //if (DBcrossRailProfile == null)
+                //    DBcrossRailProfile = new List<CrosProf> { };
+                //////continue;
+
+                ////var sortedData = DBcrossRailProfile.OrderByDescending(d => d.Meter).ToList();
+                ////var crossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBParse(sortedData);
+
+                ////List<Digression> addDigressions = crossRailProfile.GetDigressions();
+                //Digressions.AddRange(DBcrossRailProfile(Number, trip.Id));
             }
             else
             {

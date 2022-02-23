@@ -348,16 +348,34 @@ namespace ALARm_Report.Forms
 
 					var Curve_dig_str = "";
 
+					////Зазор баллы
+					//var isgap = Pu32_gap.Where(o => o.Km == km.Number).ToList();
+					//if (isgap.Any())
+					//{
+					//	kmTotal.AddParamPointSum += 50;
+					//	Zazor++;
+					//	kmTotal.Additional++;
+
+					//}
 					//Зазор баллы
 					var isgap = Pu32_gap.Where(o => o.Km == km.Number).ToList();
 					if (isgap.Any())
 					{
-						kmTotal.AddParamPointSum += 50;
-						Zazor++;
-						kmTotal.Additional++;
+						if (isgap.Where(o => o.Otst == "З").ToList().Count > 0)
+						{
+							kmTotal.AddParamPointSum += 50;
+							kmTotal.Additional += isgap.Where(x => x.Otst == "З").Count();
 
+						}
+
+						else if (isgap.Where(o => o.Otst == "З?").ToList().Count > 0)
+						{
+							kmTotal.AddParamPointSum += 20;
+
+						}
+
+						Zazor += isgap.Count;
 					}
-
 
 					var prevCurve_id = -1;
 

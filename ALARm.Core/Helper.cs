@@ -1,4 +1,4 @@
-﻿using ALARm.Core.Report;
+using ALARm.Core.Report;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
@@ -224,9 +224,10 @@ namespace ALARm.Core
                     if (pickets.Count > 0)
                     {
                         result = new Picket() { Number = pickets[pickets.Count - 1].Number + 1, Start = pickets[pickets.Count - 1].Number * 100 };
-                    } else
+                    }
+                    else
                     {
-                        result = new Picket() { Number = meter /100 +1 , Start = (meter/100)*100 };
+                        result = new Picket() { Number = meter / 100 + 1, Start = (meter / 100) * 100 };
 
                     }
                     pickets.Add(result);
@@ -234,7 +235,7 @@ namespace ALARm.Core
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine("GetPicket" + e.Message); 
+                    Console.WriteLine("GetPicket" + e.Message);
                 }
             }
             if (result == null)
@@ -685,7 +686,7 @@ namespace ALARm.Core
             var result = new List<double>();
             int n = 50;
             int avgElCount = n;
-         
+
             int bigX = 0;
             int nOld = n;
             int nNew = n;
@@ -740,7 +741,7 @@ namespace ALARm.Core
                 foundBetta2 = secondCall[1];
             }
             result = result.GetRange(prev.Count, result.Count - prev.Count);
-           
+
             if (result.Count < avg.Count)
                 result.AddRange(avg.GetRange(result.Count, avg.Count - result.Count));
             if (getPairs)
@@ -752,7 +753,7 @@ namespace ALARm.Core
             int height, ref List<NatureCurves> CurveForLvl,
             bool getPairs = false, Direction naprav = Direction.Direct, List<double> strRealData = null)
         {
-            
+
 
             var ZeroDataStright = avg.Select(o => o * 0.0).ToList();
 
@@ -1011,7 +1012,7 @@ namespace ALARm.Core
 
                     var CurveData = new List<double>();
                     var CurveIndex = new List<int>();
-                   
+
 
                     for (int ii = 0; ii < Math.Min(k_linear.Count, maxlinear.Count) - 1; ii++)
                     {
@@ -1035,13 +1036,13 @@ namespace ALARm.Core
                                 result[y] = linear_prom[p];
                                 p++;
                             }
-                            if (Curve.X.Count > 1&& (Curve.Y.Max()>8 || Curve.Y.Min() <- 8))
+                            if (Curve.X.Count > 1 && (Curve.Y.Max() > 8 || Curve.Y.Min() < -8))
                             {
                                 Curve.Added = true;
                                 Curves.Add(Curve);
                                 Curve = new NatureCurves { };
                             }
-                         
+
                         }
 
                         //5-тен жогарылары 
@@ -1088,23 +1089,23 @@ namespace ALARm.Core
                     {
                         var tempCurveMaxY = Curves[cInd].Y.Max();
 
-                        if (tempCurveMaxY <= 10 && Curves[cInd].X.Count()>50)
+                        if (tempCurveMaxY <= 10 && Curves[cInd].X.Count() > 50)
                         {
                             //начало кривой
-                            var delta =50;
+                            var delta = 50;
                             var startInd = Curves[cInd].X.First() - delta;
 
                             if (startInd < 0)
                             {
                                 startInd = 0;
                             }
-                            var tempCurveLen = Curves[cInd].X.Count() + delta+15;
+                            var tempCurveLen = Curves[cInd].X.Count() + delta + 15;
                             //конец кривой
 
 
                             if (tempCurveLen + startInd > result.Count())
                             {
-                                tempCurveLen = result.Count()-startInd;
+                                tempCurveLen = result.Count() - startInd;
                             }
 
                             Curves[cInd] = new NatureCurves { };
@@ -1119,7 +1120,7 @@ namespace ALARm.Core
                             {
                                 Console.WriteLine(e.Message);
                             }
-                           
+
                         }
 
                         if (tempCurveMaxY > 20 && Curves[cInd].X.Count() > 50)
@@ -1162,25 +1163,25 @@ namespace ALARm.Core
                     {
                         CurveForLvl.AddRange(Curves);
                     }
-                        
-                     if (CurveForLvl.Count() < 1)
+
+                    if (CurveForLvl.Count() < 1)
                     {
-                         for (int index = 0; index < resultCopy.Count(); index++)  //0=25
-                         {
-                             resultCopy[index] = 0.0;
-                         }
-                         result = resultCopy;
-                     }
+                        for (int index = 0; index < resultCopy.Count(); index++)  //0=25
+                        {
+                            resultCopy[index] = 0.0;
+                        }
+                        result = resultCopy;
+                    }
 
                     foreach (var item in Curves)
                     {
-                        
+
                         var ModifiedCurve = new List<double>();
 
                         //работа с кривой
                         var CurveMax = item.Y.Max(o => Math.Abs(o));
                         var SelectedData = item.Y.Where(o => CurveMax * 0.8 < Math.Abs(o)).ToList();
-                        
+
                         var avgSelD = SelectedData.Average();
 
                         var Head1 = item.Y.IndexOf(SelectedData.First());
@@ -1219,13 +1220,14 @@ namespace ALARm.Core
                         var HeadX_Yama_down = 0;
                         var Head2_Yama_down = 0;            //Y кордината второй(Последней(Last)) точки трапеции
                         var HeadX2_Yama_down = 0;
+                        var countYama = 0;
 
                         if (SelectedData.Count > 50 && CurveMax > 20)
                         {
 
                             // var Yama_Ind_Min = SelectedData.IndexOf(Min_SelectedData_Yama);
                             var SelectedData_Yama = item.Y.Where(o => CurveMax * 0.77 > Math.Abs(o) && item.X[item.Y.IndexOf(o)] < HeadX2 - 10 && item.X[item.Y.IndexOf(o)] > item.X[item.Y.IndexOf(SelectedData.First())] + 10);
-
+                            countYama = SelectedData_Yama.Count();
 
                             if (SelectedData_Yama.Count() > 40)
                             {
@@ -1274,23 +1276,23 @@ namespace ALARm.Core
                         var Points_manyR_str_RightY = new List<double> { };
                         var Points_manyR_str_LeftY_Head = new List<double> { };
                         var Points_manyR_str_RightY_Head = new List<double> { };
+
                         var flagLeft = 0;
                         var flagRight = 0;
-
-                        for (int iii = 1; iii <5; iii++)
+                        for (int iii = 1; iii < 5; iii++)
                         {
 
-                            var SelectedDataLeftI = item.Y.Where(o => CurveMax * 0.15* (iii + 1) > Math.Abs(o) && Math.Abs(o) > CurveMax * 0.15 * (iii)
+                            var SelectedDataLeftI = item.Y.Where(o => CurveMax * 0.15 * (iii + 1) > Math.Abs(o) && Math.Abs(o) > CurveMax * 0.15 * (iii)
                                                        && (item.X[item.Y.IndexOf(o)] < HeadX - 30)).ToList();
 
                             //var SelectedDataLeftI = item.Y.Where(o => CurveMax * (0.2 * (iii) + 0.2) > Math.Abs(o) && Math.Abs(o) > CurveMax * (0.20 * (iii - 1) + 0.20)
-                             // && (item.X[item.Y.IndexOf(o)] < HeadX - 30)).ToList();
-                         //   var SelectedDataLeftI  = item.Y.Where(o => CurveMax * (0.2 * (5 - iii + 1)+0.2) > Math.Abs(o) && Math.Abs(o) > CurveMax *( 0.2 * (5 - iii)+0.2)
-                               //                   && (item.X[item.Y.IndexOf(o)] < HeadX -20)).ToList();
+                            // && (item.X[item.Y.IndexOf(o)] < HeadX - 30)).ToList();
+                            //   var SelectedDataLeftI  = item.Y.Where(o => CurveMax * (0.2 * (5 - iii + 1)+0.2) > Math.Abs(o) && Math.Abs(o) > CurveMax *( 0.2 * (5 - iii)+0.2)
+                            //                   && (item.X[item.Y.IndexOf(o)] < HeadX -20)).ToList();
                             //var SelectedDataRightI = item.Y.Where(o => CurveMax * 0.8 > Math.Abs(o) && (item.X[item.Y.IndexOf(o)] > HeadX2)).ToList();
                             var sl = SelectedDataLeftI.Count;
-                         
-                            if (sl > 35 && flagLeft == 0 )
+
+                            if (sl > 35 && flagLeft == 0 && (countYama < 40))
                             {
                                 flagLeft = 1;
                                 var Head1I = item.Y.IndexOf(SelectedDataLeftI.First());
@@ -1303,6 +1305,7 @@ namespace ALARm.Core
                                 Points_manyR_str_LeftY_Head.Add(Head2I);
                                 Points_manyR_str_LeftX.Add(HeadXI);
                                 Points_manyR_str_LeftX.Add(HeadX2I);
+
                                 Points_manyR_str_LeftY.Add(SelectedDataLeftI.Average());
                                 Points_manyR_str_LeftY.Add(SelectedDataLeftI.Average());
                             }
@@ -1310,7 +1313,7 @@ namespace ALARm.Core
                                                        && (item.X[item.Y.IndexOf(o)] > HeadX2 + 10)).ToList();
 
                             var sr = SelectedDataRightI.Count;
-                            if (sr >50 && flagRight == 0 )
+                            if (sr > 50 && flagRight == 0 && (countYama < 40))
                             {
                                 flagRight = 1;
                                 S_Right.Add(sr);
@@ -1357,7 +1360,11 @@ namespace ALARm.Core
                             var S_min_list = new List<double> { };
                             var S_min_k_list = new List<double> { };
                             /////////////////////////////////
-
+                            var kp = 0.01;
+                            if (Points_manyR_str_LeftY.Count > 1)//&& Points_manyR_str_LeftY.Count > 1
+                            { kp = 0.1; }
+                            if (Points_manyR_str_LeftY.Count < 1 && Math.Abs(item.Y[Head1]) < 15)//&& Points_manyR_str_LeftY.Count > 1
+                            { kp = 0.25; }
                             for (int k = 0; k < 12; k++)
                             {
                                 Ss_list.Clear();
@@ -1373,7 +1380,7 @@ namespace ALARm.Core
                                         //if (y1 > y2) { s = s + 2 * (y1 - y2); }
                                         //if (y2 > y1) { s = s + (y2 - y1); } 
 
-                                        s += Math.Abs(y1 - y2) * Math.Exp(-0.01 * Math.Abs(Head1 / 2.0 - m) );
+                                        s += Math.Abs(y1 - y2) * Math.Exp(-kp * Math.Abs(Head1 / 2.0 - m));
                                     }
                                     Ss_list.Add((int)s);
                                 }
@@ -1386,7 +1393,7 @@ namespace ALARm.Core
                             var testMin_min_Ind = S_min_list.IndexOf(testMin_min);
                             var kof = S_min_k_list[testMin_min_Ind];
 
-                            var vhod = -(int)(0.65*Math.Abs(item.Y[Head1] / (0.005 * (kof - 500))));
+                            var vhod = -(int)(0.99 * Math.Abs(item.Y[Head1] / (0.005 * (kof - 500))));
 
                             HeadX = (int)(HeadX + vhod < 0 ? 0 : HeadX + vhod);
 
@@ -1403,6 +1410,10 @@ namespace ALARm.Core
                             var mH1 = 1.0;
                             var step = 0.0005;
                             var kof00 = mH1 * 1.0 * Math.Abs(item.Y[Head1]) / Head1;
+                            var kp = 0.02;
+                            if (Points_manyR_str_LeftY.Count > 1)//&& Points_manyR_str_LeftY.Count > 1
+                            { kp = 0.1; }
+
 
                             for (int k = dp; k < 2 * dp + 1; k++)
                             {
@@ -1423,7 +1434,7 @@ namespace ALARm.Core
                                         var y1 = mH1 * (1 - 0.001 * k) * y00 - (kof00 + (ii - 1000) * step) * m;
 
                                         var y2 = mH1 * (1 - 0.001 * k) * Math.Abs(item.Y[Head1 - m]);
-                                        s += Math.Abs(y1 - y2) * Math.Exp(-0.1 * Math.Abs(Head1 / 2.0 - m) ) ;
+                                        s += Math.Abs(y1 - y2) * Math.Exp(-kp * Math.Abs(Head1 / 2.0 - m));
                                     }
 
                                     Ss_listH1.Add(s);
@@ -1477,7 +1488,7 @@ namespace ALARm.Core
                                         var y1 = 1.0 * (1 - 0.001 * k) * y00 - (kof00 + (ii - 1000) * step) * m;
 
                                         var y2 = (1 - 0.001 * k) * Math.Abs(item.Y[Head2 + m]);
-                                         s+= Math.Abs((y2 - y1)) * Math.Exp(-0.01 * Math.Abs(sr - m));
+                                        s += Math.Abs((y2 - y1)) * Math.Exp(-0.01 * Math.Abs(sr - m));
                                     }
 
                                     Ss_listH2.Add(s);
@@ -1519,18 +1530,18 @@ namespace ALARm.Core
 
                                     var s = 0.0;
 
-
-                                    // if (Points_manyR_str_RightY.Count > 1)//&& Points_manyR_str_LeftY.Count > 1
-                                    //  { kr = 0.8; }
+                                    var kp = 0.1;
+                                    if (Points_manyR_str_RightY.Count > 1)//&& Points_manyR_str_LeftY.Count > 1
+                                    { kp = 1; }
 
                                     for (int m = 0; m < item.Y.Count() - Head2; m++)
                                     {
-                                        var sr =( item.Y.Count() - Head2)/2;
+                                        var sr = (item.Y.Count() - Head2) / 2;
                                         var y00 = item.Y[Head2];
                                         var y1 = (2 - 0.1 * k) * y00 + 0.002 * (ii - 500) * m;
                                         var y2 = (2.0 - 0.1 * k) * item.Y[Head2 + m];
                                         // if (Math.Sign(y) != Math.Sign(item.Y[Head2 + m]) ){ y = 0; }
-                                        s += Math.Abs(y1 - y2)*Math.Exp(-0.1 *Math.Abs(sr-m));
+                                        s += Math.Abs(y1 - y2) * Math.Exp(-kp * Math.Abs(sr - m));
                                     }
                                     S2_list.Add((int)s);
                                 }
@@ -1543,11 +1554,11 @@ namespace ALARm.Core
                             var testMin_min_Ind2 = S2_min_list.IndexOf(testMin_min2);
                             var kof2 = S2_min_k_list[testMin_min_Ind2];
 
-                            var vihod = (int)(0.65* Math.Abs(item.Y[Head2] / (0.002 * (kof2 - 500))));
-                            if (Math.Abs(item.Y[Head2]) < 10 && vihod > 70) vihod = vihod / 2;
+                            var vihod = (int)(0.99 * Math.Abs(item.Y[Head2] / (0.002 * (kof2 - 500))));
+                            if (Math.Abs(item.Y[Head2]) < 10 && vihod > 70) vihod = vihod / 1;
                             HeadX2 = (int)(HeadX2 + vihod > result.Count() ? result.Count() - 1 : HeadX2 + vihod);
                         }
-                      
+
                         var listY1 = new List<double>
                         {
                             //Math.Abs(result[HeadX]) <= 5 ? 0 : result[HeadX],
@@ -1565,23 +1576,23 @@ namespace ALARm.Core
 
                         var delta1 = 0;
                         var delta2 = 0;
-                        //try
-                        //{
-
-                        if (Math.Abs(item.Y[Head2]) < 10 && (Points_manyR_str_LeftY.Count < 1 && Points_manyR_str_RightY.Count < 1))
+                        try
                         {
-                            delta1 = Math.Abs(HeadX - item.X[item.Y.IndexOf(SelectedData.First())]);
-                            delta2 = Math.Abs(HeadX2 - item.X[item.Y.IndexOf(SelectedData.Last())]);
-                            if (delta2 > 1.5 * delta1 && delta1 < 30)
-                                HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - delta2;
-                            if (delta1 > 1.5 * delta2 & delta2 < 30)
-                                HeadX2 = item.X[item.Y.IndexOf(SelectedData.Last())] + delta1;
+                            if ((Points_manyR_str_LeftY.Count < 1 && Points_manyR_str_RightY.Count < 1) && SelectedData.Average() < 6)
+                            {
+
+
+                                delta1 = Math.Abs(HeadX - item.X[item.Y.IndexOf(SelectedData.First())]);
+                                delta2 = Math.Abs(HeadX2 - item.X[item.Y.IndexOf(SelectedData.Last())]);
+                                if (delta1 > 2.5 * delta2 && delta1 > 40 && delta2 < 100)
+                                    HeadX2 = item.X[item.Y.IndexOf(SelectedData.Last())] + (int)(1 * delta1);
+                                if (delta2 > 2.5 * delta1 & delta2 > 40 && delta2 < 100)
+                                    HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - (int)(1 * delta2);
+                                HeadX2 = (int)(HeadX2 > result.Count() ? result.Count() - 1 : HeadX2);
+                                HeadX = (int)(HeadX < 0 ? 0 : HeadX);
+                            }
                         }
-                            
-                        //    if (delta1 > 100)
-                        //        HeadX = item.X[item.Y.IndexOf(SelectedData.First())] - (int)(0.7 * delta1);
-                        //}
-                        //catch { }
+                        catch { }
 
                         /////////////////////
                         ///
@@ -1676,7 +1687,11 @@ namespace ALARm.Core
                         HalfFirst = poprStr;
                         //  if ((Math.Abs(item.Y[Head2]) < 15) || (Math.Abs(item.Y[Head1]) < 15))
                         //  { poprStr = 0; }
-                      
+                        if (Points_manyR_str_LeftY.Count < 1 && Points_manyR_str_RightY.Count < 1)
+                        {
+                            HeadX = HeadX + 5;
+                            HeadX2 = HeadX2 - 5;
+                        }
                         var listX1 = new List<int>
                         {
                             HeadX ,
@@ -1684,6 +1699,7 @@ namespace ALARm.Core
                             item.X[item.Y.IndexOf(SelectedData.Last())] -  poprStr ,
                             HeadX2
                         };
+                        //  for (int t = 0; t < (int)(listY1.Count() / 2 - 2); t++)
 
                         //Данные для карточки кривой
                         item.StrPoints.Add(HeadX - prev.Count());
@@ -1809,6 +1825,7 @@ namespace ALARm.Core
                             item.StrPoints.Add(HeadX - prev.Count());
 
                             for (var io = 0; io < Points_manyR_str_LeftX.Count; io++)
+
                             {
                                 listX1.Add(Points_manyR_str_LeftX[io] + 5);
                                 item.StrPoints.Add(Points_manyR_str_LeftX[io] + 5 - prev.Count());
@@ -1819,6 +1836,7 @@ namespace ALARm.Core
                             listX1.Add(item.X[item.Y.IndexOf(SelectedData.Last())] - 10);
                             item.StrPoints.Add(item.X[item.Y.IndexOf(SelectedData.Last())] - 10 - prev.Count());
                             for (var io = 0; io < Points_manyR_str_RightX.Count; io++)
+
                             {
 
                                 listX1.Add(Points_manyR_str_RightX[io] - 5);
@@ -1898,6 +1916,16 @@ namespace ALARm.Core
                         var c_first_count = 0;
                         // listX1.Add(item.Y.Count-1);
                         //listY1.Add(0);
+                        //var prom = 0;
+
+                        //for (int t = 1; t < listY1.Count() - 3; t++)
+
+                        //{
+                        //    listY1[t] = listY1.Average();
+
+
+                        //}
+
                         for (int t = 0; t < listY1.Count() - 1; t++)
                         {
                             for (int c = 0; c < listX1[t + 1] - listX1[t]; c++)
@@ -1919,12 +1947,12 @@ namespace ALARm.Core
                             }
                         }
 
-                        HeadX = HeadX ;
+                        HeadX = HeadX;
 
                         item.lvl_center_value = Math.Abs(avgSelD);
                         item.lvl_center_index = Math.Abs(HeadX2 - HeadX);
 
-                        if (Curves.Count()<1)
+                        if (Curves.Count() < 1)
                         {
                             for (int index = 0; index < resultCopy.Count(); index++)
                             {
@@ -1932,26 +1960,26 @@ namespace ALARm.Core
                             }
                         }
                         var InternalIndex = 0;
-                      
-                        for (int index = HeadX ; index < HeadX2; index++)
+
+                        for (int index = HeadX; index < HeadX2; index++)
                         {
                             resultCopy[index] = ModifiedCurve[InternalIndex];
                             //resultCopy[index] = result[index] ;
                             InternalIndex++;
                         }
-                        for (int index = HeadX - 1 > 0 ? HeadX +- 1 : HeadX; index < HeadX ; index++)
+                        for (int index = HeadX - 1 > 0 ? HeadX + -1 : HeadX; index < HeadX; index++)
                         {
                             resultCopy[index] = 0.0;
                         }
-                        for (int index = HeadX2 ; index < (HeadX2 + 1  <= resultCopy.Count() ? HeadX2 + 1  : HeadX2); index++)  //0=25
+                        for (int index = HeadX2; index < (HeadX2 + 1 <= resultCopy.Count() ? HeadX2 + 1 : HeadX2); index++)  //0=25
                         {
                             resultCopy[index] = 0.0;
                         }
                     }
-                    
 
 
-              
+
+
                     result = resultCopy;
                 }
 
@@ -2007,13 +2035,13 @@ namespace ALARm.Core
                         for (int iii = 2; iii < 4; iii++)
 
                         {
-                           
+
 
                             var SelectedDataLeftI = item.Y.Where(o => CurveMax * 0.2 * (iii + 1) > Math.Abs(o) && Math.Abs(o) > CurveMax * 0.2 * (iii)
                                                     && (item.X[item.Y.IndexOf(o)] < HeadX - 10)).ToList();
 
 
-                      
+
                             var sl = SelectedDataLeftI.Count;
                             if (sl > 50 && FlagLeft == 0)//
 
@@ -2138,7 +2166,7 @@ namespace ALARm.Core
 
 
 
-                        if (Math.Abs(item.Y[Head1]) >H0)
+                        if (Math.Abs(item.Y[Head1]) > H0)
                         {
                             var M_luch = new List<double> { };
                             var Ss_list = new List<double> { };
@@ -2165,7 +2193,7 @@ namespace ALARm.Core
                                         var y1 = 1.0 * (1 - 0.001 * k) * y00 - (kof00 + (ii - 1000) * step) * m;
 
                                         var y2 = (1 - 0.001 * k) * Math.Abs(item.Y[Head1 - m]);
-                                        s += Math.Abs((y2 - y1)) * Math.Exp(-0.1 * Math.Abs(Head1/2 - m));
+                                        s += Math.Abs((y2 - y1)) * Math.Exp(-0.1 * Math.Abs(Head1 / 2 - m));
                                     }
 
                                     Ss_list.Add(s);
@@ -2269,7 +2297,7 @@ namespace ALARm.Core
                                         // var y1 = 1.0 * (1 - 0.001 * k) * y00 - (kof00 + (ii - 1000) * step) * m;
 
                                         var y2 = (1 - 0.001 * k) * Math.Abs(item.Y[Head2 + m]);
-                                        s += Math.Abs((y2 - y1)) * Math.Exp(-0.21 * Math.Abs(sr - m)   -0.21 * Math.Abs(sr - m+3) - 0.21 * Math.Abs(sr - m-3));
+                                        s += Math.Abs((y2 - y1)) * Math.Exp(-0.21 * Math.Abs(sr - m) - 0.21 * Math.Abs(sr - m + 3) - 0.21 * Math.Abs(sr - m - 3));
                                         //s += Math.Abs(y2 - y1);
                                         //}
                                     }
@@ -2356,18 +2384,18 @@ namespace ALARm.Core
                             listY1.Add(0);
                         };
 
-                     
 
 
-                  
+
+
                         var HalfFirst = 0;  //x1
-                        var HalflAST =0;  //x2
-                      
-                     
+                        var HalflAST = 0;  //x2
 
-                       
-                     
-                       var    popr = 10;
+
+
+
+
+                        var popr = 10;
                         var delta1 = 0;
                         var delta2 = 0;
                         try
@@ -2390,7 +2418,7 @@ namespace ALARm.Core
                         catch { }
 
                         HalfFirst = popr;
-                        HalflAST=-popr;
+                        HalflAST = -popr;
                         var listX1 = new List<int>
                         {
                             HeadX  ,
@@ -2404,7 +2432,7 @@ namespace ALARm.Core
                         item.LevelPoints.Add(HeadX - prev.Count());
                         item.LevelPoints.Add(item.X[item.Y.IndexOf(SelectedData.First())] + popr - prev.Count());
                         item.LevelPoints.Add(item.X[item.Y.IndexOf(SelectedData.Last())] - popr - prev.Count());
-                        item.LevelPoints.Add(HeadX2  - prev.Count());
+                        item.LevelPoints.Add(HeadX2 - prev.Count());
 
 
                         if (Points_manyR_Level_LeftY.Count > 1 && Points_manyR_Level_RightY.Count < 1)
@@ -2455,7 +2483,7 @@ namespace ALARm.Core
 
                         };
 
-                        
+
                         if (Points_manyR_Level_LeftY.Count > 1 && Points_manyR_Level_RightY.Count > 1)
                         {
                             listX1.Clear();
@@ -2515,7 +2543,7 @@ namespace ALARm.Core
                         }
 
                         var InternalIndex = 0;
-                        for (int index = HeadX ; index < HeadX2 ; index++)
+                        for (int index = HeadX; index < HeadX2; index++)
                         {
                             //if (index < ModifiedCurve.Count)
                             {
@@ -2655,7 +2683,7 @@ namespace ALARm.Core
                     return transitions;
                 return cropped;
             }
-             
+
             catch (Exception e)
             {
                 System.Console.WriteLine(e.Message);
@@ -2691,7 +2719,7 @@ namespace ALARm.Core
 
             //    }
             //}
-          
+
             return ZeroDataStright;
         }
 
