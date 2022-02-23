@@ -525,6 +525,7 @@ namespace ALARm.Core
         public int CorrectionMeter { get; set; } = -1;
         public CorrectionType CorrectionType { get; set; } = CorrectionType.None;
         public List<DigressionMark> Digressions { get; set; } = new List<DigressionMark>();
+        public List<Digression> AdditionalDigressions { get; set; } = new List<Digression>();
 
         public List<CorrectionNote> CorrectionNotes = new List<CorrectionNote>();
         public List<Gap> Gaps { get; set; } = new List<Gap>();
@@ -1276,12 +1277,11 @@ namespace ALARm.Core
                 var utem = 0;
                 var yxr01 = 0.0;
                 var yxu = 0.0;
-                meter[j] = i;
                 int lvlsign = 1;
 
                 try
                 {
-
+                    meter[j] = i;
                     outdatas[j] = outdatas[j];
                     fsh0[j] = 1520;
                     snorm[j] = 1520;
@@ -1466,15 +1466,23 @@ namespace ALARm.Core
                     //PasportLevel += $"{-1 * Math.Abs(yxu) * tempSign:0.00},{j} ";
 
                     PasportGauge += $"{(fsh0[j] - 1520) * GaugeKoef:0.00},{j} ";
+                    j++;
                     //PasportStraightLeft += $"{-1 * Math.Abs(yxr01) * tempSign * StrightKoef:0.00},{j} ";
 
-
-                    j++;
+                    /*if (j < meter.Count)
+                    {
+                        j++;
+                    }
+                    else
+                    {
+                        break;
+                    }*/
                 }
 
                 catch (Exception e)
                 {
                     Console.WriteLine("Kilometer.GetZeroLines Error: " + e.Message);
+                    break;
                 }
             }
             for (int i = 0; i < fsh0.Count - 1; i++)

@@ -5,7 +5,7 @@
 
 
 # Appsettings:
-*.json
+#*.json
 
 # User-specific files
 *.rsuser

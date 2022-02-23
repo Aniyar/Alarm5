@@ -2,9 +2,12 @@
 using ALARm.Core.Report;
 using ALARm.Services;
 using ALARm_Report.controls;
+using Dapper;
 using MetroFramework.Controls;
+using Npgsql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -297,6 +300,9 @@ namespace ALARm_Report.Forms
                             addParam.Add(new XElement("polyline", new XAttribute("points", HeadWearRight)));
 
                             List<Digression> addDigressions = crossRailProfile.GetDigressions();
+                             // заполняет таблицу с доп параметрами
+                             //var Insert_additional_param_state = AdditionalParametersService.Insert_additional_param_state(addDigressions);
+
 
                             var dignatur = new List<DigressionMark> { };
 
