@@ -49,9 +49,6 @@ ALARmProcees/ALARmProcess.dproj.local
 ALARmProcees/ALARmProcess.identcache
 ALARmProcees/DataModule.dfm
 ALARmProcees/pgsparam.txt
-ALARm_Report/App.config
-AlARMBase/App.config
-AlarmPP.Web/appsettings.json
 # Uncomment if you have tasks that create the project's static files in wwwroot
 #wwwroot/
 
