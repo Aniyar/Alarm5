@@ -487,13 +487,18 @@ namespace AlarmPP.Web.Services
                         }
                         if (km.IsPrinted)
                         {
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1,2, 3, 4 });
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            //var DBcrossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBbyKm(km, Trip.Id);
+                            ///var crossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBParse(DBcrossRailProfile);
+                            km.AdditionalDigressions = RdStructureRepository.GetAdditional(km.Number);
+
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
                             km.Fasteners = AdditionalParametersRepository.Check_badfastening_state(Trip.Id, 999);
                             km.DefShpals = AdditionalParametersRepository.Check_defshpal_state(Trip.Id, 999);
                             km.PerShpals = AdditionalParametersRepository.Check_ViolPerpen(Trip.Id);
+                            Kilometers.Add(km);
                             //if (!km.CorrectionNotes.Any())
                             //{
                             //    km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
@@ -504,8 +509,7 @@ namespace AlarmPP.Web.Services
                             //}
 
                         }
-
-                        Kilometers.Add(km);
+                        
                     }
                     else if (numberFound && WorkMode == WorkMode.Postprocessing)
                     {
@@ -557,7 +561,11 @@ namespace AlarmPP.Web.Services
                             //{
                             //    km.TrapezLevel += $"{km.LevelAvgTrapezoid[i] * km.StrightKoef:0.00},{km.Meters[i]} ";
                             //}
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1,2, 3, 4 });
+
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            //km.AdditionalDigressions = RdStructureRepository.GetCrossRailProfileFromDBbyKm(km.Number, Trip.Id);
+                            km.AdditionalDigressions = RdStructureRepository.GetAdditional(km.Number);
+
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);

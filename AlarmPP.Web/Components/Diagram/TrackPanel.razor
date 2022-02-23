@@ -460,7 +460,7 @@
     <div style="float:left; height:100%">
         @if (AppData != null && AppData.Data != null)
         {
-        <p>@AppData.Data[(int)Services.Series.Section] Путь: @AppData.Kilometers[0].Track_name Км: @AppData.CurrentKm М:@AppData.CurrentKmMeter</p>
+            <p>@AppData.Data[(int)Services.Series.Section] Путь: @AppData.Kilometers[0].Track_name Км: @AppData.CurrentKm М:@AppData.CurrentKmMeter</p>
         }
         <DigressionTable @ref="digressionTable" Kilometers="@AppData.Kilometers"></DigressionTable>
     </div>
@@ -507,6 +507,9 @@
     }
     <div class="float-left">
         <Alarmcheck kilometers="@AppData.Kilometers"></Alarmcheck>
+    </div>
+    <div class="float-left">
+        <AdditionalParams kilometers="@AppData.Kilometers"></AdditionalParams>
     </div>
 </div>
 <MatDialog @bind-IsOpen="@StopDialog" Stacked="true">

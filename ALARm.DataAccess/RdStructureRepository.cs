@@ -2571,7 +2571,7 @@ namespace ALARm.DataAccess
                 SELECT trip.*, direction.name as direction_name FROM trips as trip 
                 INNER JOIN adm_direction as direction on direction.id = trip.direction_id
                 WHERE
-                  trip.id = 242
+                  trip.id = 240
                   --current = true 
                   order by id desc limit 1";
                 
@@ -3339,6 +3339,73 @@ namespace ALARm.DataAccess
 	                    s3.meter"
 
                     ).ToList();
+            }
+        }
+
+        public List<Digression> GetAdditional(int km)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+
+                return db.Query<Digression>($@"
+                    SELECT *
+                    FROM s3_additional 
+                    WHERE
+	                    kmetr = {km}
+                    ORDER BY
+	                    s3_additional.kmetr,
+	                    s3_additional.meter"
+
+                ).ToList();
+            }
+        }
+
+        public List<CrosProf> GetCrossRailProfileFromDBbyKm(int nkm, long trip_id)
+        {
+            using (IDbConnection db = new NpgsqlConnection(Helper.ConnectionString()))
+            {
+                if (db.State == ConnectionState.Closed)
+                    db.Open();
+                try
+                {
+                    return db.Query<CrosProf>($@"
+                            SELECT DISTINCT
+	                            meter,
+	                            AVG ( pu_l ) pu_l,
+	                            AVG ( pu_r ) pu_r,
+	                            AVG ( vert_l ) vert_l,
+	                            AVG ( vert_r ) vert_r,
+	                            AVG ( bok_l ) bok_l,
+	                            AVG ( bok_r ) bok_r,
+	                            AVG ( npk_l ) npk_l,
+	                            AVG ( npk_r ) npk_r,
+	                            AVG ( shortwavesleft ) shortwavesleft,
+	                            AVG ( shortwavesright ) shortwavesright,
+	                            AVG ( mediumwavesleft ) mediumwavesleft,
+	                            AVG ( mediumwavesright ) mediumwavesright,
+	                            AVG ( longwavesleft ) longwavesleft,
+	                            AVG ( longwavesright ) longwavesright,
+	                            AVG ( iz_45_l ) iz_45_l,
+	                            AVG ( iz_45_r ) iz_45_r 
+                            FROM
+	                            PUBLIC.profiledata_{trip_id}
+                            WHERE
+	                            km = {nkm}
+	                            AND meter > 0 
+                            GROUP BY
+	                            meter 
+                            ORDER BY
+	                            meter DESC ", commandType: CommandType.Text).ToList();
+                }
+                catch (Exception e)
+                {
+                    //Console.WriteLine("GetCrossRailProfileFromDBbyKm error: " + e.Message);
+                    return new List<CrosProf> { };
+                }
+
+
             }
         }
 
