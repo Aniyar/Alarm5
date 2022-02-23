@@ -75,7 +75,7 @@ namespace ALARm_Report.Forms
 				XElement comparativeTrip, comparativeSection, comparativeByKilometer;
 
 				var kilometers = RdStructureService.GetPU32Kilometers(from, to, parentId, tripType); //.GetRange(65,15);
-				kilometers = kilometers.OrderBy(km => km.Track_name).ToList();
+				// kilometers = kilometers.OrderBy(km => km.Number).ToList();
 				var cn = kilometers.Count;
 				var comparativeKilometers = new List<Kilometer>();
 				if (comparativePeriod != null)
@@ -85,24 +85,12 @@ namespace ALARm_Report.Forms
 				{
 					MessageBox.Show("Нет отчетных данных по выбранным параметрам");
 					return;
-
-
 				}
 				if (reportType == PU32Type.Comparative && comparativeKilometers.Count == 0)
 				{
 					MessageBox.Show("Нет отчетных данных для сравнения");
 					return;
 				}
-				//if (kilometers.Count < comparativeKilometers.Count && reportType == PU32Type.Comparative)
-				//{
-				//	(kilometers, comparativeKilometers) = (comparativeKilometers, kilometers);
-				//	(tripType, comparativeTripType) = (comparativeTripType, tripType);
-				//	(period, comparativePeriod) = (comparativePeriod, period);
-
-				//}
-
-				//var trips = RdStructureService.GetTrips();
-				//var trip = trips.Where(o => o.Id == kilometers[0].Trip.Id).ToList();
 
 
 				XElement report = new XElement("report",
@@ -194,7 +182,7 @@ namespace ALARm_Report.Forms
 					comparative_check_gap_state = AdditionalParametersService.Check_gap_state(comparativeKilometers.First().Trip.Id, template.ID); //стыки
 					comparativePRU = RdStructureService.GetS3(comparativeKilometers.First().Trip.Id, DigressionName.Pru.Name) as List<S3>; //пру
 					comparative_gapV = comparative_check_gap_state.Where(o => o.Vdop != "" && o.Vdop != "-/-").ToList();
-					comparativePu32_gap = comparative_check_gap_state.Where(o => o.Otst.Contains("З") || o.Otst.Contains("З?")).ToList();
+					comparativePu32_gap = comparative_check_gap_state.Where(o => o.Otst_l.Contains("З") || o.Otst_r.Contains("З?") || o.Otst_r.Contains("З") || o.Otst_l.Contains("З?")).ToList();
 				}
 
 
@@ -228,10 +216,30 @@ namespace ALARm_Report.Forms
 				var pdTotal = new Total();
 				pdTotal.Code = kilometers[0].PdCode;
 
+
 				var pdbElement = new XElement("pdb",
 					new XAttribute("PDcode", kilometers[0].PdCode),
 					new XAttribute("code", kilometers[0].PdbCode),
 					new XAttribute("chief", kilometers[0].PdbChief));
+
+
+				var pdElementn = new XElement("pdn",
+					new XAttribute("code", kilometers[0].PdCode),
+					new XAttribute("chief", kilometers[0].PdChief),
+					new XAttribute("pchu", kilometers[0].PchuCode),
+					new XAttribute("PDcode", kilometers[0].PdCode),
+					new XAttribute("pch", distance.Code)
+					);
+
+				var pdTotaln = new Total();
+				pdTotaln.Code = kilometers[0].PdCode;
+
+				var pdbElementn = new XElement("pdbn",
+					new XAttribute("PDcode", kilometers[0].PdCode),
+					new XAttribute("code", kilometers[0].PdbCode),
+					new XAttribute("chief", kilometers[0].PdbChief));
+
+
 				XElement compPdbElement = null;
 				Total compPdbTotal = null;
 				Total compPdTotal = null;
@@ -248,10 +256,6 @@ namespace ALARm_Report.Forms
 
 				}
 				var pdbTotal = new Total();
-
-
-
-
 				pdbTotal.Code = kilometers[0].PdbCode;
 
 				Kilometer compKm = null;
@@ -264,15 +268,507 @@ namespace ALARm_Report.Forms
 				var flag_start = true ;
 				var km_startNumber = 0;
 				var trackI=0;
-			
+
+				var allpdbcodes = kilometers.Select(x => x.PdbCode).Distinct().ToList();
+				foreach (var pdbcode in allpdbcodes)
+				{
+					var pdbTotaln = new Total();
+					pdbTotaln.Code = pdbcode;
+					foreach (var km in kilometers)
+					{
+						if (km.PdbCode == pdbcode)
+						{
+							List<Gap> check_gap_state = AdditionalParametersService.Check_gap_state(km.Trip.Id, template.ID); //стыки
+							var gapV = check_gap_state.Where(o => o.Vdop != "" && o.Vdop != "-/-").ToList();
+							var Pu32_gap = check_gap_state.Where(o => o.Otst_l.Contains("З") || o.Otst_r.Contains("З") || o.Otst_l.Contains("З?") || o.Otst_r.Contains("З?")).ToList();
+
+							var gapvPlusPu32_gap = Pu32_gap.Count() + gapV.Count();
+							//var pu32_gap =;
+							if (gapvPlusPu32_gap != null)
+							{
+								Pu32_gap_count = gapvPlusPu32_gap;
+							};
+
+							//var gapv =;
+							if (gapV.Any()) gapV_count++;
+
+							var dopBall = PRU.Count() * 50 + (gapV.Count() > 0 ? 50 : 0) + (AddParam.Count() > 0 ? 50 : 0);
+							var DopCount = gapV.Count() + AddParam.Count();
+
+							if (reportType == PU32Type.Comparative)
+							{
+								try
+								{
+									compKm = comparativeKilometers.Where(ck => ck.Number == km.Number && ck.Track_id == km.Track_id).ToList().First();
+									compKm.LoadTrackPasport(MainTrackStructureService.GetRepository(), compKm.TripDate);
+									compKm.Digressions = RdStructureService.GetDigressionMarks(compKm.Trip.Id, compKm.Track_id, compKm.Number);
+								}
+								catch
+								{
+									compKm = null;
+								}
+								if (compKm == null)
+								{
+									continue;
+								}
+							}
+							progressBar.Value += 1;
+							km.LoadTrackPasport(MainTrackStructureService.GetRepository(), km.TripDate);
+							km.Digressions = RdStructureService.GetDigressionMarks(km.Trip.Id, km.Track_id, km.Number);
+
+							//данные стыка
+							var gaps = new List<Digression> { };
+							var tempGaps = Pu32_gap.Where(o => o.Km == km.Number).ToList();
+							foreach (var gap in tempGaps)
+							{
+								var PassSpeed = km.Speeds.Count > 0 ? km.Speeds[0].Passenger : -1;
+								var FreightSpeed = km.Speeds.Count > 0 ? km.Speeds[0].Freight : -1;
+
+								var digression = new Digression { };
+
+								digression.Meter = gap.Meter;
+
+								if (gap.Otst_l == "З" || gap.Otst_r == "З")
+								{
+									digression.PassengerSpeedLimit = int.Parse(gap.Vdop.Split('/')[0]);
+									digression.FreightSpeedLimit = int.Parse(gap.Vdop.Split('/')[1]);
+								}
+								else
+								{
+									digression.PassengerSpeedLimit = -1;
+									digression.FreightSpeedLimit = -1;
+								}
+								digression.AllowSpeed = gap.Vdop;
+								
+								if (gap.Otst_l != "")
+								{
+									digression.DigName = gap.Otst_l == "З" ? DigressionName.Gap_left : DigressionName.GapSimbol_left;
+									digression.Velich = gap.Zazor;
+									digression.prim += digression.DigName.Name + " " + digression.Velich;
+								}
+								
+								if (gap.Otst_r != "")
+								{
+									digression.DigName = gap.Otst_r == "З" ? DigressionName.Gap_right : DigressionName.GapSimbol_right;
+									digression.Velich = gap.R_zazor;
+									digression.prim += digression.DigName.Name + " " + digression.Velich;
+								}
+
+								gaps.Add(digression);
+							}
+							foreach (var dig in gaps)
+							{
+								int count = dig.Length / 4;
+								count += dig.Length % 4 > 0 ? 1 : 0;
+
+								var side = " " + (dig.Threat == (Threat)Threat.Right ? "п." : dig.Threat == (Threat)Threat.Left ? "л." : "");
+
+								km.Digressions.Add(
+									new DigressionMark()
+									{
+										Digression = dig.DigName,
+										NotMoveAlert = false,
+										Meter = dig.Meter,
+										finish_meter = dig.Kmetr,
+										Length = dig.Length,
+										Value = dig.Velich,
+										Count = count,
+										DigName = dig.GetName(),
+										PassengerSpeedLimit = dig.PassengerSpeedLimit,
+										FreightSpeedLimit = dig.FreightSpeedLimit,
+										Comment = "",
+										AllowSpeed = dig.AllowSpeed
+									});
+							}
+
+							//данные Износа рельса Бок.из.
+							var DBcrossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBbyKm(km.Number, km.Trip.Id);
+							if (DBcrossRailProfile == null)
+								DBcrossRailProfile = new List<CrosProf> { };
+							//continue;
+
+							var sortedData = DBcrossRailProfile.OrderByDescending(d => d.Meter).ToList();
+							var crossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBParse(sortedData);
+
+							List<Digression> addDigressions = crossRailProfile.GetDigressions();
+
+							var dignatur = new List<DigressionMark> { };
+							foreach (var dig in addDigressions)
+							{
+								int count = dig.Length / 4;
+								count += dig.Length % 4 > 0 ? 1 : 0;
+
+								if (dig.DigName == DigressionName.SideWearLeft || dig.DigName == DigressionName.SideWearRight)
+								{
+									dignatur.Add(new DigressionMark()
+									{
+										Digression = dig.DigName,
+										NotMoveAlert = false,
+										Meter = dig.Meter,
+										finish_meter = dig.Kmetr,
+										Degree = (int)dig.Typ,
+										Length = dig.Length,
+										Value = dig.Value,
+										Count = count,
+										DigName = dig.GetName(),
+										PassengerSpeedLimit = -1,
+										FreightSpeedLimit = -1,
+										Comment = "",
+										Diagram_type = "Iznos_relsov",
+										Digtype = DigressionType.Additional
+									});
+								}
+							}
+							//выч-е скорости бок износа
+							int pas = 999, gruz = 999;
+							foreach (DigressionMark item in dignatur)
+							{
+								if (item.Digression == DigressionName.SideWearLeft || item.Digression == DigressionName.SideWearRight)
+								{
+									var c = km.Curves.Where(o => o.RealStartCoordinate <= km.Number + item.Meter / 10000.0 && o.RealFinalCoordinate >= km.Number + item.Meter / 10000.0).ToList();
+
+									if (c.Any())
+									{
+										item.GetAllowSpeedAddParam(km.Speeds.First(), c.First().Straightenings[0].Radius, item.Value);
+
+										if (item.PassengerSpeedLimit != -1 && item.PassengerSpeedLimit < pas)
+										{
+											pas = item.PassengerSpeedLimit;
+										}
+										if (item.FreightSpeedLimit != -1 && item.FreightSpeedLimit < gruz)
+										{
+											gruz = item.FreightSpeedLimit;
+										}
+									}
+								}
+								else if (item.Digression == DigressionName.Gap)
+								{
+									if (item.PassengerSpeedLimit != -1 && item.PassengerSpeedLimit < pas)
+									{
+										pas = item.PassengerSpeedLimit;
+									}
+									if (item.FreightSpeedLimit != -1 && item.FreightSpeedLimit < gruz)
+									{
+										gruz = item.FreightSpeedLimit;
+									}
+								}
+
+							}
+							dignatur = dignatur.Where(o => o.PassengerSpeedLimit >= 0 || o.FreightSpeedLimit >= 0).ToList();
+
+							km.Digressions.AddRange(dignatur);
+
+							var gap_dig = AddParam.Where(o => o.Km == km.Number).ToList();
+							foreach (var item in gap_dig)
+							{
+								km.Digressions.Add(new DigressionMark
+								{
+									Km = item.Km,
+									Meter = item.Meter,
+									Length = item.Len,
+									DigName = item.Ots,
+									Count = item.Kol,
+									Value = item.Otkl,
+									PassengerSpeedLimit = item.Ogp,
+									FreightSpeedLimit = item.Ogp,
+									Digtype = DigressionType.Additional
+								});
+							}
+							var Glag_grk = false;
+							var kriv = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ")
+							&& (o.DigName.Equals("Укл") || o.DigName.Equals("?Уkл") || o.DigName.Equals("Анп") || o.DigName.Equals("Пси") && !o.Comment.Contains("-/-") && !o.Comment.Contains("") && !o.FreightSpeedLimit.Equals("-") && !o.PassengerSpeedLimit.Equals("-"))).ToList();
+							if (kriv.Any()) Kriv += kriv.Count;
+							var pru = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && o.DigName.Equals("ПрУ")).ToList();
+							if (pru.Any()) Pru += pru.Count;
+
+							var oshk = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Contains("З?") && !o.DigName.Equals("ПрУ") && o.DigName.Equals("Oтв.ш")).ToList();
+							if (oshk.Any()) Oshk += oshk.Count;
+
+							var iznos = km.Digressions.Where(o => o.DigName.Equals("Иб.л") || o.DigName.Equals("Иб.п") || o.DigName.Equals("Ив.л") || o.DigName.Equals("Ив.п") ||
+																	o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п")).ToList();
+							if (iznos.Any()) Iznos += iznos.Count;
+
+							var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Equals("ПрУ") && (o.DigName.Contains("З?")) && km.Number == km.Digressions.Select(x => x.Km).ToList().First()).ToList();
+							if (zazor.Any()) Zazor += zazor.Count;
+							var kmTotal = new Total();
+							Total comparativeKMTotal = null;
+							kmTotal.IsKM = true;
+							if (kriv.Any())
+							{
+								kmTotal.Kriv = kriv.Count;
+							}
+							if (pru.Any())
+							{
+								kmTotal.Pru = pru.Count;
+							}
+							if (oshk.Any())
+							{
+								kmTotal.Oshk = oshk.Count;
+							}
+							if (iznos.Any())
+							{
+								kmTotal.Iznos = iznos.Count;
+							}
+							if (zazor.Any())
+							{
+								km.Number = km.Number;
+								kmTotal.Zazor = zazor.Count;
+							}
+							var add_dig_str = "";
+							var comp_add_dig_str = "";
+							var Curve_dig_str = "";
+							var comp_curve_dig_str = "";
+							//Зазор баллы
+							var isgap = Pu32_gap.Where(o => o.Km == km.Number).ToList();
+							if (isgap.Any())
+							{
+								if (isgap.Where(o => o.Otst_l == "З" || o.Otst_r == "З").ToList().Count > 0)
+								{
+									kmTotal.AddParamPointSum += 50;
+									kmTotal.Additional += isgap.Where(x => x.Otst_l == "З" || x.Otst_r == "З").Count();
+								}
+								else if (isgap.Where(o => o.Otst_l == "З?" || o.Otst_r == "З?").ToList().Count > 0)
+								{
+									kmTotal.AddParamPointSum += 20;
+								}
+								Zazor += isgap.Count;
+							}
+							var prevCurve_id = -1;
+							//переменная огр скорости для качественной оценки км
+							var Districted = 0;
+							foreach (var digression in km.Digressions)
+							{
+								if ((digression.DigName.Contains("Пси") || digression.DigName.Contains("?Пси")) && digression.LimitSpeedToString() == "-/-")
+									continue;
+								//&& !digression.Comment.Contains("Натурная кривая")
+								if ((digression.LimitSpeedToString() != "-/-") && (digression.LimitSpeedToString() != ""))
+								{
+									Districted++;
+								}
+
+								if (digression.Comment != "" || digression.Comment == null)
+								{
+									if (Districted > 0)
+									{
+										Districted = Districted - 1;
+									}
+								}
+								if (digression.Digtype == DigressionType.Main)
+								{
+									kmTotal.MainParamPointSum += digression.GetPoint(km);
+									//ToDo - ағамен ақылдасу керек
+									kmTotal.CurvePointSum += digression.GetCurvePoint(km);
+								}
+
+								//Износ баллы
+								if (digression.Digression == DigressionName.SideWearLeft || digression.Digression == DigressionName.SideWearRight)
+								{
+									if (digression.Km == 708)
+									{
+
+									}
+									var noteCoord = km.Number.ToDoubleCoordinate(digression.Meter);
+									var isCurve = km.Curves.Where(o => o.RealStartCoordinate <= noteCoord && o.RealFinalCoordinate >= noteCoord).ToList();
+									if (isCurve.Any())
+									{
+										if (prevCurve_id != (int)isCurve.First().Id)
+										{
+											kmTotal.AddParamPointSum += 50;
+											kmTotal.Additional++;
+										}
+										prevCurve_id = (int)isCurve.First().Id;
+									}
+									add_dig_str += $"V={digression.PassengerSpeedLimit}/{digression.FreightSpeedLimit} пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value:0.0}/{digression.Length}; ";
+								}
+								//Пру кривая баллы
+								if (digression.Digression == DigressionName.Pru)
+								{
+									kmTotal.Curves++;
+
+									Curve_dig_str += $"пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}/{digression.Length}; ";
+								}
+								//ПСИ АНП Укл Аг кривая 
+								if (digression.Digression == DigressionName.Psi ||
+									digression.Digression == DigressionName.SpeedUp ||
+									digression.Digression == DigressionName.Ramp)
+								{
+									var otkl = "";
+									if (digression.Comment.Any())
+									{
+										try
+										{
+											otkl = digression.Comment.Split().First().Split(':').Last();
+										}
+										catch
+										{
+											otkl = "";
+										}
+									}
+									Curve_dig_str += $"V={digression.PassengerSpeedLimit}/{digression.FreightSpeedLimit} пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {otkl}; ";
+									kmTotal.Curves++;
+								}
+								//зазоры
+								if (digression.Digression.Name == "ЗЛ" || digression.Digression.Name == "ЗП")
+								{
+									add_dig_str += $"V={digression.PassengerSpeedLimit}/{digression.FreightSpeedLimit} пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
+								}
+								else if (digression.Digression.Name == "З?Л" || digression.Digression.Name == "З?П")
+								{
+									add_dig_str += $"пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
+								}
+								digression.DigNameToDigression(digression.DigName);
+
+								if (digression.Degree < 5)
+									switch (digression.DigName)
+									{
+										case string digname when digname.Equals("Суж"):
+											digression.Digression = DigressionName.Constriction;
+											kmTotal.Constriction.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+
+										case string digname when digname.Equals("Уш"):
+											digression.Digression = DigressionName.Broadening;
+											kmTotal.Broadening.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+
+										case string digname when digname.Equals("У"):
+											digression.Digression = DigressionName.Level;
+											kmTotal.Level.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+
+										case string digname when digname.Equals("П"):
+											digression.Digression = DigressionName.Sag;
+											kmTotal.Sag.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+										case string digname when digname.Equals("Пр.л") || digname.Equals("Пр.п"):
+											digression.Digression = (digname.Equals("Пр.л")) ? DigressionName.DrawdownLeft : DigressionName.DrawdownRight;
+											kmTotal.Drawdown.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+										case string digname when digname.Equals("Р"):
+											digression.Digression = DigressionName.Strightening;
+											kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+										case string digname when (digname.Equals("Рнр") && digression.Degree == 4):
+											digression.Digression = DigressionName.Strightening;
+											kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+										case string digname when digname.Equals("Рст"):
+											digression.Digression = DigressionName.Strightening;
+											kmTotal.Strightening.Degrees[digression.Degree - 1] += digression.GetCount();
+											break;
+									}
+								if (digression.DigName.Equals("Р") && digression.Degree == 2)
+								{
+									var kmq = digression.Km;
+									var met = digression.Meter;
+									DevDegree2++;
+								}
+								var flag_gr = false;
+								if (digression.Comment != null) if (digression.Comment.Contains("гр")) flag_gr = true;
+								if (((digression.LimitSpeedToString().Any(char.IsDigit) || flag_gr) && !digression.DigName.Equals("ПрУ")
+									&& !digression.DigName.Contains("кривая факт.") && !digression.DigName.Contains("З?") && !digression.Comment.Contains("-/-")))
+								{
+									kmTotal.IsLimited = 1;
+									//MessageBox.Show(digression.Km.ToString() + '-' +digression.DigName + '-' + digression.LimitSpeedToString());
+
+									if (digression.Degree == 4 && digression.Digtype == DigressionType.Main && !digression.DigName.Contains("З?")
+										&& !digression.DigName.Contains("кривая факт.") && !digression.DigName.Equals("ПрУ"))
+									{
+										kmTotal.Fourth++;
+									}
+									//if (digression.Digtype != DigressionType.Main && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт."))
+									if (digression.DigName.Contains("З") && !digression.DigName.Contains("З?") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.") && digression.DigName.Contains("Изн"))
+
+									{
+										kmTotal.Additional++;
+									}
+
+								}
+								if (digression.Comment != null)
+								{
+									if ((digression.Comment.Contains("ОШК") || digression.Comment.Contains("ОШП") || digression.Comment.Contains("Уобр")) &&
+
+										!digression.Comment.Contains("m") && !digression.Comment.Contains("гр") && !digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.")
+										&& !(digression.Degree == 4 && digression.Digtype == DigressionType.Main) && !digression.DigName.Contains("Изн") && digression.LimitSpeedToString().Any(char.IsDigit)
+										)
+									{
+										//kmTotal.IsLimited = 1;
+										kmTotal.Other++;
+									}
+									if ((digression.Comment.Contains("гр") || digression.Comment.Contains("m")) && (digression.Degree == 3) && !digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.")
+										&& (!(digression.Degree == 4) && digression.Digtype == DigressionType.Main) && !digression.DigName.Contains("Изн")
+																		)
+									{
+										kmTotal.Grk = kmTotal.Grk + 1;
+
+									}
+									if ((digression.Degree == 3) && !digression.DigName.Contains("З") && !digression.DigName.Equals("ПрУ") && !digression.DigName.Contains("кривая факт.")
+										&& (!(digression.Degree == 3) && digression.Digtype == DigressionType.Main) && !digression.DigName.Contains("Изн")
+											&&
+											(digression.DigName.Contains("П") && digression.DigName.Contains("Р") || digression.DigName.Contains("П") && digression.DigName.Contains("Пр") ||
+											digression.DigName.Contains("Пр") && digression.DigName.Contains("Р")
+												))
+									{
+										kmTotal.Sochet = Sochet + 1;
+									}
+								}
+							}
+							kmTotal.Grk = kmTotal.Grk + kmTotal.Fourth;
+							kmTotal.Broadening.Degrees[0] = km.FDBroad;
+							kmTotal.Constriction.Degrees[0] = km.FDConstrict;
+							kmTotal.Sag.Degrees[0] = km.FDSkew;
+							kmTotal.Strightening.Degrees[0] = km.FDStright;
+							kmTotal.Drawdown.Degrees[0] = km.FDDrawdown;
+							kmTotal.Level.Degrees[0] = km.FDLevel;
+							kmTotal.QualitiveRating = km.CalcQualitiveRating(kmTotal.MainParamPointSum + kmTotal.CurvePointSum, Districted);
+							var kmElement = new XElement("km",
+							new XAttribute("n", km.Number),
+							new XAttribute("len", km.Lkm % 1 == 0 ? km.Lkm.ToString("0", nfi) : km.Lkm.ToString("0.000", nfi)),
+							new XAttribute("c1", kmTotal.Constriction.ToString()),
+							new XAttribute("c2", kmTotal.Broadening.ToString()),
+							new XAttribute("c3", kmTotal.Level.ToString()),
+							new XAttribute("c4", kmTotal.Sag.ToString()),
+							new XAttribute("c5", kmTotal.Drawdown.ToString()),
+							new XAttribute("c6", kmTotal.Strightening.ToString()),
+							new XAttribute("c7", kmTotal.Common),
+							new XAttribute("c8", kmTotal.FourthOtherAdd == "-/ - / - " ? "" : kmTotal.FourthOtherAdd),
+							new XAttribute("c9", $"{kmTotal.MainParamPointSum + kmTotal.CurvePointSum}/{kmTotal.AddParamPointSum}"),
+							new XAttribute("c10", kmTotal.QualitiveRating),
+							new XAttribute("c11", km.Primech + " "), // Отступления с таблицы бедомость
+							new XAttribute("c12", add_dig_str), //Отступления доп пар
+							new XAttribute("c13", Curve_dig_str), //Отступления кривые
+							new XAttribute("apoint", (kmTotal.AddParamPointSum > 0 ? kmTotal.AddParamPointSum.ToString() : "---")), //балл отст для доп пар
+
+							new XAttribute("speed", $"{(km.Speeds.Count > 0 ? $"{km.Speeds.Last().Passenger}/{km.Speeds.Last().Freight}" : $"{km.GlobPassSpeed}/{km.GlobFreightSpeed}")}"),
+							new XAttribute("cor", (km.CorrCount > 0 ? "+" : "") + (km.IsLowActivity ? "*" : "")),
+							new XAttribute("mpoint", kmTotal.MainParamPointSum),
+
+							new XAttribute("allsum", (kmTotal.MainParamPointSum + kmTotal.CurvePointSum + kmTotal.AddParamPointSum)), //итого по км
+
+							new XAttribute("cpoint", (kmTotal.CurvePointSum > 0 ? kmTotal.CurvePointSum.ToString() : "---"))
+
+							);
+
+							kmElement.Add(new XAttribute("isComp", (reportType == PU32Type.Comparative ? 1 : 0)));
+							kmTotal.Length = km.Lkm;
+							pdbTotaln += kmTotal;
+							pdbElementn.Add(kmElement);
+						}
+
+					}
+
+					PDBnTotalGenerate(ref pdbElementn, ref pdbTotaln, ref pdElementn, ref pdTotaln, pdbcode, "", ref compPdbTotal, ref compPdTotal);
+					// pdTotaln += pdbTotaln;
+					// pdElementn.Add(pdbElementn);
+				}
+
 				foreach (var km in kilometers)
 				{
 						List<Gap> check_gap_state = AdditionalParametersService.Check_gap_state(km.Trip.Id, template.ID); //стыки
 						var gapV = check_gap_state.Where(o => o.Vdop != "" && o.Vdop != "-/-").ToList();
-						var Pu32_gap = check_gap_state.Where(o => o.Otst.Contains("З") || o.Otst.Contains("З?")).ToList();
+					var Pu32_gap = check_gap_state.Where(o => o.Otst_l.Contains("З") || o.Otst_r.Contains("З") || o.Otst_l.Contains("З?") || o.Otst_r.Contains("З?")).ToList();
 
-
-						var gapvPlusPu32_gap = Pu32_gap.Count() + gapV.Count();
+					var gapvPlusPu32_gap = Pu32_gap.Count() + gapV.Count();
 						//var pu32_gap =;
 						if (gapvPlusPu32_gap != null)
 						{
@@ -345,7 +841,7 @@ namespace ALARm_Report.Forms
 
 							digression.Meter = gap.Meter;
 
-							if (gap.Otst == "З")
+							if (gap.Otst_l == "З" || gap.Otst_r == "З")
 							{
 								digression.PassengerSpeedLimit = int.Parse(gap.Vdop.Split('/')[0]);
 								digression.FreightSpeedLimit = int.Parse(gap.Vdop.Split('/')[1]);
@@ -356,10 +852,22 @@ namespace ALARm_Report.Forms
 								digression.FreightSpeedLimit = -1;
 							}
 							digression.AllowSpeed = gap.Vdop;
-							digression.Velich = Math.Max(gap.Zazor, gap.R_zazor);
-							digression.DigName = gap.Otst == "З" ? DigressionName.Gap : DigressionName.GapSimbol;
+							//digression.Velich = Math.Max(gap.Zazor, gap.R_zazor);
+							//digression.DigName = gap.Otst == "З" ? DigressionName.Gap : DigressionName.GapSimbol;
+						if (gap.Otst_l != "")
+						{
+							digression.DigName = gap.Otst_l == "З" ? DigressionName.Gap_left : DigressionName.GapSimbol_left;
+							digression.Velich = gap.Zazor;
+							digression.prim += digression.DigName.Name + " " + digression.Velich;
+						}
 
-							gaps.Add(digression);
+						if (gap.Otst_r != "")
+						{
+							digression.DigName = gap.Otst_r == "З" ? DigressionName.Gap_right : DigressionName.GapSimbol_right;
+							digression.Velich = gap.R_zazor;
+							digression.prim += digression.DigName.Name + " " + digression.Velich;
+						}
+						gaps.Add(digression);
 						}
 						foreach (var dig in gaps)
 						{
@@ -505,7 +1013,7 @@ namespace ALARm_Report.Forms
 															  o.DigName.Equals("Ип.л") || o.DigName.Equals("Ип.п")).ToList();
 						if (iznos.Any()) Iznos += iznos.Count;
 
-						var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Equals("ПрУ") && (o.DigName.Equals("З?")) && km.Number == km.Digressions.Select(x => x.Km).ToList().First()).ToList();
+						var zazor = km.Digressions.Where(o => !o.DigName.Contains("кривая факт.") && !o.DigName.Equals("ПрУ") && (o.DigName.Equals("З?Л") || o.DigName.Equals("ЗЛ") || o.DigName.Equals("З?П") || o.DigName.Equals("ЗП")  ) && km.Number == km.Digressions.Select(x => x.Km).ToList().First()).ToList();
 						if (zazor.Any()) Zazor += zazor.Count;
 
 
@@ -555,14 +1063,14 @@ namespace ALARm_Report.Forms
 						var isgap = Pu32_gap.Where(o => o.Km == km.Number).ToList();
 						if (isgap.Any())
 						{
-							if (isgap.Where(o => o.Otst == "З").ToList().Count > 0)
+							if (isgap.Where(o => o.Otst_l == "З" || o.Otst_r == "З").ToList().Count > 0)
 							{
 								kmTotal.AddParamPointSum += 50;
-								kmTotal.Additional += isgap.Where(x => x.Otst == "З").Count();
+								kmTotal.Additional += isgap.Where(x => x.Otst_l == "З" || x.Otst_r == "З").Count();
 
 							}
 
-							else if (isgap.Where(o => o.Otst == "З?").ToList().Count > 0)
+							else if (isgap.Where(o => o.Otst_l == "З?" || o.Otst_r == "З?").ToList().Count > 0)
 							{
 								kmTotal.AddParamPointSum += 20;
 
@@ -677,11 +1185,11 @@ namespace ALARm_Report.Forms
 								kmTotal.Curves++;
 							}
 							//зазоры
-							if (digression.Digression.Name == "З")
+							if (digression.Digression.Name == "ЗЛ" || digression.Digression.Name == "ЗП")
 							{
 								add_dig_str += $"V={digression.PassengerSpeedLimit}/{digression.FreightSpeedLimit} пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
 							}
-							else if (digression.Digression.Name == "З?")
+							else if (digression.Digression.Name == "З?Л" || digression.Digression.Name == "З?П")
 							{
 								add_dig_str += $"пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
 							}
@@ -860,9 +1368,9 @@ namespace ALARm_Report.Forms
 							var compGap = comparativePu32_gap.Where(o => o.Km == compKm.Number).ToList();
 							if (compGap.Any())
 							{
-								if (compGap.Where(o => o.Otst == "З").ToList().Count > 0)
+								if (compGap.Where(o => o.Otst_l == "З" || o.Otst_r == "З").ToList().Count > 0)
 									comparativeKMTotal.AddParamPointSum += 50;
-								else if (compGap.Where(o => o.Otst == "З?").ToList().Count > 0)
+								else if (compGap.Where(o => o.Otst_l == "З?" || o.Otst_r == "З?").ToList().Count > 0)
 									comparativeKMTotal.AddParamPointSum += 20;
 								CompZazor++;
 							}
@@ -929,12 +1437,12 @@ namespace ALARm_Report.Forms
 									comparativeKMTotal.Curves++;
 								}
 								//зазоры
-								if (digression.Digression.Name == "З")
+								if (digression.Digression.Name == "ЗЛ" || digression.Digression.Name == "ЗП")
 								{
 									comp_add_dig_str += $"V={digression.PassengerSpeedLimit}/{digression.FreightSpeedLimit} пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
 								}
-								else if (digression.Digression.Name == "З?")
-								{
+								else if (digression.Digression.Name == "З?Л" || digression.Digression.Name == "З?П")
+							{
 									comp_add_dig_str += $"пк{(digression.Meter - 1) / 100 + 1} {digression.DigName} {digression.Value}; ";
 								}
 
@@ -1279,7 +1787,10 @@ namespace ALARm_Report.Forms
 					new XAttribute("point", $"{distanceTotal.MainParamPointSum + distanceTotal.CurvePointSum}/{distanceTotal.AddParamPointSum}"),
 					new XAttribute("rating", distanceTotal.GetSectorQualitiveRating().Split('/')[1]),
 					new XAttribute("rtype", (tripType == TripType.Additional ? "Доп." : tripType == TripType.Control ? "Конт." : "Раб.") + " " + period.Period)); ; ;
-				
+
+
+				tripElment.Add(pdElementn);
+
 				report.Add(tripElment,
 					new XAttribute("code", kilometers[0].Direction_code),
 					new XAttribute("track", kilometers[0].Track_name),
@@ -1523,7 +2034,43 @@ namespace ALARm_Report.Forms
 								new XAttribute("code", code),
 								new XAttribute("chief", chief));
 			}
-			void PDBTotalGenerate(ref XElement pdbElement, ref Total pdbTotal, ref XElement pdElement, ref Total pdTotal, string code, string chief, ref Total compPdbTotal, ref Total compPdTotal)
+
+	void PDBnTotalGenerate(ref XElement pdbElement, ref Total pdbTotal, ref XElement pdElement, ref Total pdTotal, string code, string chief, ref Total compPdbTotal, ref Total compPdTotal)
+			{
+				var avgBall1 = (pdbTotal.MainParamPointSum + pdbTotal.CurvePointSum) / pdbTotal.Length;
+				var avgBall2 = (pdbTotal.MainParamPointSum + pdbTotal.CurvePointSum + pdbTotal.AddParamPointSum) / pdbTotal.Length;
+
+				pdbElement.Add(
+					new XAttribute("c1", pdbTotal.Constriction.ToString()),
+					new XAttribute("c2", pdbTotal.Broadening.ToString()),
+					new XAttribute("c3", pdbTotal.Level.ToString()),
+					new XAttribute("c4", pdbTotal.Sag.ToString()),
+					new XAttribute("c5", pdbTotal.Drawdown.ToString()),
+					new XAttribute("c6", pdbTotal.Strightening.ToString()),
+					new XAttribute("c7", pdbTotal.Common),
+					new XAttribute("c8", pdbTotal.FourthOtherAdd),
+
+					new XAttribute("avgLine", $" {avgBall2:0}/{pdbTotal.GetSectorQualitiveRating().Split('/')[1]}"),
+
+					new XAttribute("len", pdbTotal.Length % 1 == 0 ? pdbTotal.Length.ToString("0", nfi) : pdbTotal.Length.ToString("0.000", nfi)),
+					new XAttribute("point", $"{pdbTotal.MainParamPointSum + pdbTotal.CurvePointSum}/{pdbTotal.AddParamPointSum}"),
+					new XAttribute("rating", pdbTotal.GetSectorQualitiveRating()),
+					new XAttribute("ratecount",
+
+					$"Отл - {pdbTotal.RatingCounts[0].ToString("0", nfi)}; Хор - {pdbTotal.RatingCounts[1].ToString("0", nfi)}; Уд - {pdbTotal.RatingCounts[2].ToString("0", nfi)}; Неуд - {pdbTotal.RatingCounts[3].ToString("0", nfi)}; Средний балл - {avgBall1:0}/{avgBall2:0}"),
+					new XAttribute("ttype", reportType == PU32Type.Comparative ? (tripType == TripType.Control ? "контрольная" : (tripType == TripType.Additional ? "дополнительная" : "рабочая")) : ""));
+
+				pdTotal += pdbTotal;
+				pdbTotal = new Total();
+				pdbTotal.Code = code;
+
+				pdElement.Add(pdbElement);
+
+				pdbElement = new XElement("pdbn", new XAttribute("code", code), new XAttribute("chief", chief));
+			}
+		
+
+	void PDBTotalGenerate(ref XElement pdbElement, ref Total pdbTotal, ref XElement pdElement, ref Total pdTotal, string code, string chief, ref Total compPdbTotal, ref Total compPdTotal)
 			{
 				var avgBall1 = (pdbTotal.MainParamPointSum + pdbTotal.CurvePointSum) / pdbTotal.Length;
 				var avgBall2 = (pdbTotal.MainParamPointSum + pdbTotal.CurvePointSum + pdbTotal.AddParamPointSum) / pdbTotal.Length;

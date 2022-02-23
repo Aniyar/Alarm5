@@ -58,12 +58,14 @@
         public static DigName ImpulsLeft = new DigName() { Name = "ИН.л", Value = 107 };
         public static DigName ImpulsRight = new DigName() { Name = "ИН.п", Value = 108 }; //импульс
         public static DigName FusingGap = new DigName() { Name = "СЗ", Value = 109 };
+
         public static DigName Gap = new DigName() { Name = "З", Value = 110 };
         public static DigName GapSimbol = new DigName() { Name = "З?", Value = 1100 };
 
-        public static DigName GapSimbol_left = new DigName() { Name = "З?Л", Value = 1100 };
-
-        public static DigName GapSimbol_right = new DigName() { Name = "З?П", Value = 1100 };
+        public static DigName GapSimbol_left = new DigName() { Name = "З?Л", Value = 1101 };
+        public static DigName GapSimbol_right = new DigName() { Name = "З?П", Value = 1102 };
+        public static DigName Gap_right = new DigName() { Name = "ЗП", Value = 1103 };
+        public static DigName Gap_left = new DigName() { Name = "ЗЛ", Value = 1104 };
         public static DigName AnomalisticGap = new DigName() { Name = "АРЗ", Value = 111 };
         public static DigName None = new DigName() { Name = "Отсут.", Value = 112 };
 

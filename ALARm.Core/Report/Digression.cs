@@ -88,6 +88,8 @@ namespace ALARm.Core.Report
         public string Name { get; set; }
         public float Value { get; set; }
         public int Length { get; set; }
+        public string dig_rim { get; set; }
+        
         public int Count { get; set; } = 1;
         public object Typ { get; set; }
         public string FullSpeed { get; set; }
@@ -103,6 +105,9 @@ namespace ALARm.Core.Report
         public string PdCount { get; set; }
         public int Kmetr { get; set; }
         public float Lkm { get; set; }
+
+        public string prim { get; set; } = "";
+        
         public DigName DigName { get; set; } = DigressionName.Undefined;
         public DigName R_DigName { get; set; } = DigressionName.Undefined;
         public Threat Threat { get; set; }
@@ -239,6 +244,7 @@ namespace ALARm.Core.Report
         public int Km { get; set; }
         public int Degree { get; set; }
         public int Length { get; set; }
+        public string Prim { get; set; }
         public double Radius { get; set; } = 10000;
         public CrosTieType CrosTieType { get; set; } = CrosTieType.Concrete;
         public float Dlina { get; set; }

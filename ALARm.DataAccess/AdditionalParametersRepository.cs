@@ -1029,11 +1029,11 @@ namespace ALARm.DataAccess
                                             ", commandType: CommandType.Text).ToList();
 
                     gaps = gaps.Where(o => Math.Abs(o.Zabeg) < 500).ToList();
-                    foreach (Gap gap in gaps){
+                    /*foreach (Gap gap in gaps){
                         gap.R_zazor = (int)(gap.R_zazor / 1.4);
                         gap.Zazor = (int)(gap.Zazor / 1.4);
                         gap.Zabeg = (int)(gap.Zabeg / 1.4);
-                    }
+                    }*/
                     return gaps;
                 }
                 catch (Exception e)
@@ -1118,28 +1118,30 @@ namespace ALARm.DataAccess
                                 double k = (double)gap.H / (double)r.First().H;
                                 gap.Zazor = (int)(r.First().Zazor * k);
                                 gap.GetDigressions436();
-                                if (gap.DigName.Name.Equals("З?"))
-                                    gap.DigName.Name = "З?Л";
-                                if (gap.DigName.Name.Equals("З"))
-                                    gap.DigName.Name = "ЗЛ";
+                                //if (gap.DigName.Name.Equals("З?"))
+                                //    gap.DigName.Name = "З?Л";
+                                //if (gap.DigName.Name.Equals("З"))
+                                //    gap.DigName.Name = "ЗЛ";
                             }
                             if (r.First().Zazor == -1)
                             {
                                 double k = (double)r.First().H / (double)gap.H;
                                 r.First().Zazor = (int)(gap.Zazor * k);
                                 r.First().GetDigressions436();
-                                if (gap.DigName.Name.Equals("З?"))
-                                    gap.DigName.Name = "З?Л";
-                                if (gap.DigName.Name.Equals("З"))
-                                    gap.DigName.Name = "ЗЛ";
+                                //if (gap.DigName.Name.Equals("З?"))
+                                //    gap.DigName.Name = "З?Л";
+                                //if (gap.DigName.Name.Equals("З"))
+                                //    gap.DigName.Name = "ЗЛ";
                             }
 
                             zabeg = (gap.Koord - r.First().Koord).ToString();
                             Vdop = gap.Zazor < r.First().Zazor ? r.First().AllowSpeed : gap.AllowSpeed;
-                            Ots = gap.DigName.Name == "неизвестный" ? r.First().DigName.Name : gap.DigName.Name;
+                            
                         }
 
-                        var Dig = Ots == "неизвестный" ? "" : Ots;
+                        var Dig_l = gap.DigName.Name == "неизвестный" ? "" : gap.DigName.Name;
+                        var Dig_r = r.First().DigName.Name == "неизвестный" ? "" : r.First().DigName.Name;
+                        // var Dig = Ots == "неизвестный" ? "" : Ots;
 
                         i++;
 
@@ -1156,7 +1158,8 @@ namespace ALARm.DataAccess
                                             temp,
 	                                        zabeg,
 	                                        vdop,
-	                                        otst,
+	                                        otst_l,
+                                            otst_r,
 	                                        file_id,
 	                                        fnum,
 	                                        ms,
@@ -1182,7 +1185,8 @@ namespace ALARm.DataAccess
                                             '{gap.temp}',
                                             '{zabeg}',
                                             '{ (!r.Any() ? gap.AllowSpeed : Vdop)}',
-                                            '{ Dig }',
+                                            '{ Dig_l }',
+                                            '{ Dig_r }',
                                             '{gap.Fileid}',
                                             '{gap.Fnum}',
                                             '{gap.Ms}',

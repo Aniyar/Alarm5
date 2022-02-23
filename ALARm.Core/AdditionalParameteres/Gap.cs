@@ -91,7 +91,9 @@ namespace ALARm.Core.AdditionalParameteres
         public string Vdop { get; set; }
         public string Vpz { get; set; }
         public string Otst { get; set; }
-
+        public string Otst_l { get; set; }
+        public string Otst_r { get; set; }
+        
 
         public int Start { get; set; }
         public string Code { get; set; }
