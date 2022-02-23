@@ -3832,7 +3832,7 @@ namespace ALARm.DataAccess
                 END 
                 AS alert
                 from s3 where trip_id = {trip_id} and track_id = {track_id} and km = {km}   and 
-	            typ > 0
+	            typ > 1
                 GROUP BY track_id, trip_id, km, typ, len, otkl, kol, ots, ovp, ogp, uv, uvg, is2to3, isequalto3, isequalto4, onswitch, islong, comment, meter
                 ORDER BY
 	                meter").ToList();

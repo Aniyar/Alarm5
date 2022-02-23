@@ -357,11 +357,18 @@ namespace ALARm.Core.Report
             //рисуем бесстыковые пути
             foreach (var longRails in longRailses)
             {
+                //if (longRails.Start_M > kilometer.Final_m)
+                //    break;
+                //if (longRails.Start_M < kilometer.Start_m)
+                //    break;
+                //int y1 = kilometer.Start_m;
+                //int y2 = kilometer.Final_m; 
                 int start = longRails.Start_Km == kilometer.Number ? longRails.Start_M : y1;
                 int final = longRails.Final_Km == kilometer.Number ? longRails.Final_M : y2;
                 result.Add(
                     new XElement("longRails",
                     new XAttribute("y1", -start),
+
                     new XAttribute("y2", -final))
                     );
             }
@@ -715,10 +722,7 @@ namespace ALARm.Core.Report
             ref int fourStepOgrCoun,
             ref int otherfourStepOgrCoun)
         {
-            if (kilometer.StationSection.Any())
-            {
-
-            }
+          
             Digression = Digression.OrderBy(o => o.Meter).ToList();
 
             foreach (var note in Digression)
@@ -746,7 +750,8 @@ namespace ALARm.Core.Report
                     if (kilometer.StationSection.Any())
                         meter = Start + 20;
                     if (meter <= Start.RoundTo10() + 10)
-                        meter += 10;
+                       
+                            meter += 10;
 
                     if (usedTops.Contains(meter))
                         meter = usedTops.GetNextTop(Start, meter, Number);
