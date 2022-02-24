@@ -1029,7 +1029,11 @@ namespace ALARm.DataAccess
                                             ", commandType: CommandType.Text).ToList();
 
                     gaps = gaps.Where(o => Math.Abs(o.Zabeg) < 500).ToList();
-
+                    foreach (Gap gap in gaps){
+                        gap.R_zazor = (int)(gap.R_zazor / 1.4);
+                        gap.Zazor = (int)(gap.Zazor / 1.4);
+                        gap.Zabeg = (int)(gap.Zabeg / 1.4);
+                    }
                     return gaps;
                 }
                 catch (Exception e)
@@ -3038,6 +3042,50 @@ max(final-start) as zazor, max(final-start) as Length, max(start) as start,
                 }
 
             }
+        }
+
+        public List<Digression> Insert_additional_param_state(List<Digression> addDigressions)
+        {
+            int index = 0;
+            foreach (var adddig in addDigressions)
+            {
+                try
+                {
+                    using (var db = new NpgsqlConnection(Helper.ConnectionString()))
+                    {
+                        if (db.State == ConnectionState.Closed)
+                            db.Open();
+                        var txt = $@"INSERT INTO s3_additional (id,
+                                                                trip_id,
+                                                                kmetr,
+                                                                meter,
+                                                                typ,
+                                                                digname,
+                                                                direction_num,
+                                                                founddate,
+                                                                threat,
+                                                                r_threat,
+                                                                LENGTH,
+                                                                LOCATION,
+                                                                norma,
+                                                                r_digname,
+                                                                VALUE,
+                                                                COUNT,
+                                                                allowspeed,
+                                                                primech 
+                                                                )
+                                                 VALUES ({index}, {adddig.Kmetr}, {adddig.Meter}, {adddig.Typ}, '{adddig.DigName}', {adddig.Direction_num}, '{adddig.FoundDate}', '{adddig.Threat}', '{adddig.R_threat}', {adddig.Length}, '{adddig.Location}', '{adddig.Norma}', '{adddig.R_DigName}', {adddig.Value}, {adddig.Count}, '{adddig.AllowSpeed}', '{adddig.Primech}')";
+                        db.Execute(txt);
+                    }
+                    index++;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Insert_additional_param_state error: " + e.Message);
+                    return new List<Digression> { };
+                }
+            }
+            return addDigressions;
         }
         public List<CrosProf> GetCrossRailProfileFromDBbyCurve(Curve curve, long trip_id)
         {

@@ -1616,6 +1616,7 @@ namespace ALARm.Core.AdditionalParameteres
                 dig3Right.Value = dig3RightValue;
                 result.Add(dig3Right);
             }
+            
             return result;
         }
 

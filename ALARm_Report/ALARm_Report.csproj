@@ -363,7 +363,6 @@
     <Compile Include="Forms\AdditionalParameters\GDSummaryOfAditionalParameters_new.cs" />
     <Compile Include="Forms\AdditionalParameters\GDSummaryOfAditionalParameters.cs" />
     <Compile Include="Forms\AdditionalParameters\GD_iznos_relsov.cs" />
-    <Compile Include="Forms\AdditionalParameters\AdditionalParameters_new.cs" />
     <Compile Include="Forms\AdditionalParameters\GD_PR.cs" />
     <Compile Include="Forms\AdditionalParameters\GD_iznos_relsov_new.cs" />
     <Compile Include="Forms\AdditionalParameters\GD_NN_new.cs" />

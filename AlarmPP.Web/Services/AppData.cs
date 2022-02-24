@@ -346,27 +346,27 @@ namespace AlarmPP.Web.Services
         /// <summary>
         /// показать отступления
         /// </summary>
-        public bool ShowDigressions { get; set; }
-        public bool ShowDangerousDigressions { get; set; }
-        public bool ShowDangerousForEmtyWagon { get; set; }
-        public bool Show3DegreeDigressions { get; set; }
-        public bool ShowCloseToDangerous { get; set; }
-        public bool ShowCloseTo2Degree { get; set; }
+        public bool ShowDigressions { get; set; } = false;
+        public bool ShowDangerousDigressions { get; set; } = false;
+        public bool ShowDangerousForEmtyWagon { get; set; } = false;
+        public bool Show3DegreeDigressions { get; set; } = false;
+        public bool ShowCloseToDangerous { get; set; } = false;
+        public bool ShowCloseTo2Degree { get; set; } = false;
 
-        public bool FirstDegreeDigression { get; set; }
-        public bool Show2DegreeDigressions { get; set; }
-        public bool Show1DegreeDigressions { get; set; }
-        public bool ShowOthersDigressions { get; set; }
-        public bool ShowExcludedOnSwitch { get; set; }
-        public bool ShowExcludedByOerator { get; set; }
-        public bool ShowNotTakenOnRating { get; set; }
-        public bool DigressionChecked { get; set; }
-        public bool ShowGaps { get; set; }
-        public bool ShowGapsCloseToDangerous {get; set;}
-        public bool ShowBolts { get; set; }
-        public bool ShowFasteners { get; set; }
-        public bool ShowPerShpals { get; set; }
-        public bool ShowDefShpals { get; set; }
+        public bool FirstDegreeDigression { get; set; } = false;
+        public bool Show2DegreeDigressions { get; set; } = false;
+        public bool Show1DegreeDigressions { get; set; } = false;
+        public bool ShowOthersDigressions { get; set; } = false;
+        public bool ShowExcludedOnSwitch { get; set; } = false;
+        public bool ShowExcludedByOerator { get; set; } = false;
+        public bool ShowNotTakenOnRating { get; set; } = false;
+        public bool DigressionChecked { get; set; } = false;
+        public bool ShowGaps { get; set; } = false;
+        public bool ShowGapsCloseToDangerous {get; set; } = false;
+        public bool ShowBolts { get; set; } = false;
+        public bool ShowFasteners { get; set; } = false;
+        public bool ShowPerShpals { get; set; } = false;
+        public bool ShowDefShpals { get; set; } = false;
         public int GetDistanceFrom1div(int div, float degKoef) {
             var res = 1f / div * degKoef;
             return Convert.ToInt32(res);
@@ -487,13 +487,18 @@ namespace AlarmPP.Web.Services
                         }
                         if (km.IsPrinted)
                         {
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1, 2, 3, 4 });
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            //var DBcrossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBbyKm(km, Trip.Id);
+                            ///var crossRailProfile = AdditionalParametersService.GetCrossRailProfileFromDBParse(DBcrossRailProfile);
+                            km.AdditionalDigressions = RdStructureRepository.GetAdditional(km.Number);
+
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
                             km.Fasteners = AdditionalParametersRepository.Check_badfastening_state(Trip.Id, 999);
                             km.DefShpals = AdditionalParametersRepository.Check_defshpal_state(Trip.Id, 999);
                             km.PerShpals = AdditionalParametersRepository.Check_ViolPerpen(Trip.Id);
+                            Kilometers.Add(km);
                             //if (!km.CorrectionNotes.Any())
                             //{
                             //    km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
@@ -504,8 +509,7 @@ namespace AlarmPP.Web.Services
                             //}
 
                         }
-
-                        Kilometers.Add(km);
+                        
                     }
                     else if (numberFound && WorkMode == WorkMode.Postprocessing)
                     {
@@ -557,7 +561,11 @@ namespace AlarmPP.Web.Services
                             //{
                             //    km.TrapezLevel += $"{km.LevelAvgTrapezoid[i] * km.StrightKoef:0.00},{km.Meters[i]} ";
                             //}
-                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {1, 2, 3, 4 });
+
+                            km.Digressions = RdStructureRepository.GetDigressionMarks(Trip.Id, km.Number, km.Track_id, new int[] {2, 3, 4 });
+                            //km.AdditionalDigressions = RdStructureRepository.GetCrossRailProfileFromDBbyKm(km.Number, Trip.Id);
+                            km.AdditionalDigressions = RdStructureRepository.GetAdditional(km.Number);
+
                             km.CorrectionNotes = RdStructureRepository.GetCorrectionNotes(Trip.Id, km.Track_id, km.Number, coord, km.CorrectionValue);
                             km.Gaps = AdditionalParametersRepository.Check_gap_state(Trip.Id, 999);
                             km.Bolts = AdditionalParametersRepository.Check_bolt_state(Trip.Id, 999);
@@ -993,7 +1001,9 @@ namespace AlarmPP.Web.Services
         DangerousDigression, DangerousForEmtyWagon, ThirdDegreeDigressions, CloseToDangerous, CloseTo2Degree,
         SecondDegreeDigression,FirstDegreeDigression, OthersDigressions, ExcludedOnSwitch, ExcludedByOerator,
       
-        NotTakenOnRating, Joints, RailProfile, Gaps, GapCloseToDangerous, Bolts, Fasteners, PerShpals, DefShpals
+        NotTakenOnRating, Joints,  Gaps, GapCloseToDangerous, Bolts, Fasteners, PerShpals, DefShpals,
+            //additional
+            RailProfile
     }
     public enum Series { Pasport = 0, LevelZero = 1, LevelPasport = 2, LevelSignal = 3, 
         StrightRightZero = 4, StrightRightPasport = 5, StrightRightSignal = 6,

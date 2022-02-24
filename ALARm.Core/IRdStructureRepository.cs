@@ -114,8 +114,9 @@ namespace ALARm.Core
         List<Trips> GetTrips(int count = 10);
         int InsertKilometer(Kilometer km);
         List<DigressionMark> GetDigressionMarks(long trip_id,int km, long track_id, int[] type);
+        List<CrosProf> GetCrossRailProfileFromDBbyKm(int nkm, long trip_id);
         List<Gap> GetGaps(long tripId, GapSource source, int km);
-
+        List<Digression> GetAdditional(int km);
         void SendEkasuiData(Trips trip, int km);
 
         List<RdProfile> getRefrenceData(Dictionary<String,Object> p);
